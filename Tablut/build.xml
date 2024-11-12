@@ -9,7 +9,7 @@
 
     <target name="compile">
         <mkdir dir="build"/>
-        <javac encoding="iso-8859-1" srcdir="src" destdir="build" includeantruntime="false">
+        <javac encoding="iso-8859-1" srcdir="src" destdir="build" includeantruntime="false"> 
             <classpath>
                 <pathelement path="lib/gson-2.2.2.jar" />
                 <pathelement path="lib/commons-cli-1.4.jar" />
@@ -112,7 +112,7 @@
     </target>
 
     <target name="goatclient">
-        <jar destfile="goatclient.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="Executables/goatclient.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="it.unibo.ai.didattica.competition.tablut.player.client.TheGoatClient"/>
                 <attribute name="Class-Path" value="."/>

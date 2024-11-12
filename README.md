@@ -1,7 +1,8 @@
 # TablutCompetition
+
 Software for the Tablut Students Competition
 
-## Installation on Ubuntu/Debian 
+## Installation on Ubuntu/Debian
 
 From console, run these commands to install JDK 8 e ANT:
 
@@ -21,6 +22,7 @@ git clone https://github.com/AGalassi/TablutCompetition.git
 
 The easiest way is to utilize the ANT configuration script from console.
 Go into the project folder (the folder with the `build.xml` file):
+
 ```
 cd TablutCompetition/Tablut
 ```
@@ -32,7 +34,7 @@ ant clean
 ant compile
 ```
 
-The compiled project is in  the `build` folder.
+The compiled project is in the `build` folder.
 Run the server with:
 
 ```
@@ -51,7 +53,6 @@ At this point, a window with the game state should appear.
 
 To be able to run other classes, change the `build.xml` file and re-compile everything
 
-
 ## Replay function
 
 Replay a game using the logfile
@@ -62,3 +63,16 @@ Example:
 java -jar .\server.jar -g -R .\logs\PLAYER1_vs_PLAYER2_1652711382324_gameLog.txt
 ```
 
+## Run and compile
+
+Compilare player:
+
+```
+ant goatclient
+```
+
+Eseguire player:
+
+```
+java -jar ./Executables/goatclient.jar white
+```
