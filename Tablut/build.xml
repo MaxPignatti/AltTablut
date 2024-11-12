@@ -112,7 +112,7 @@
     </target>
 
     <target name="goatclient">
-        <jar destfile="Executables/goatclient.jar" filesetmanifest="mergewithoutmain">
+        <!-- <jar destfile="Executables/goatclient.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="it.unibo.ai.didattica.competition.tablut.player.client.TheGoatClient"/>
                 <attribute name="Class-Path" value="."/>
@@ -120,9 +120,14 @@
             <fileset dir="build"/>
             <zipfileset excludes="META-INF/*.SF" src="lib/gson-2.2.2.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="lib/commons-cli-1.4.jar"/>
-        </jar>
+        </jar> -->
+        <java classname="it.unibo.ai.didattica.competition.tablut.player.client.TheGoatClient" fork="true">
+            <classpath>
+                <pathelement location="lib/gson-2.2.2.jar"/>
+                <pathelement location="build"/>
+            </classpath>
+        </java>
     </target>
-
 
 
 </project>

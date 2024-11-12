@@ -29,6 +29,7 @@ public class TheGoatClient extends TablutClient {
     public void run() {
         // Loop principale del client
         while (true) {
+            System.out.println("dnetro while run");
             try {
                 this.read();
                 State state = this.getCurrentState();
@@ -59,8 +60,10 @@ public class TheGoatClient extends TablutClient {
         String ipAddress = "localhost";
 
         if (args.length < 1) {
-            System.out.println("Usage: java TheGoatClient <role> [<timeout>] [<ip-address>]");
-            System.exit(-1);
+            // System.out.println("Usage: java TheGoatClient <role> [<timeout>] [<ip-address>]");
+            // System.exit(-1);
+            System.out.println("fanculo args");
+            role = "white";
         } else {
             role = args[0];
             if (args.length >= 2) {
@@ -72,6 +75,7 @@ public class TheGoatClient extends TablutClient {
         }
 
         try {
+            System.out.println("dentro try");
             TheGoatClient client = new TheGoatClient(role, name, timeout, ipAddress);
             client.run();
         } catch (IOException | ClassNotFoundException e) {
