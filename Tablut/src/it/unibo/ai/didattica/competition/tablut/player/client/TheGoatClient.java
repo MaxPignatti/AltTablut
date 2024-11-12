@@ -1,44 +1,72 @@
 package it.unibo.ai.didattica.competition.tablut.player.client;
 
+import it.unibo.ai.didattica.competition.tablut.client.TablutRandomClient;
 import it.unibo.ai.didattica.competition.tablut.domain.*;
 import it.unibo.ai.didattica.competition.tablut.player.search.heuristics.*;
 import it.unibo.ai.didattica.competition.tablut.client.TablutClient;
 import it.unibo.ai.didattica.competition.tablut.player.search.IterativeDeepeningAlphaBetaSearch;
 import java.io.IOException;
+import java.net.UnknownHostException;
 
 public class TheGoatClient extends TablutClient {
 
-    private IterativeDeepeningAlphaBetaSearch searchAlgorithm;
-    private Heuristic heuristic;
-    private int timeout;
+    private final IterativeDeepeningAlphaBetaSearch searchAlgorithm;
+    private final int timeout;
 
     public TheGoatClient(String player, String name, int timeout, String ipAddress) throws IOException, ClassNotFoundException {
         super(player, name, ipAddress);
         this.timeout = timeout;
-        // Inizializzazione dell'euristica in base al giocatore
-        // Inizializzazione dell'euristica in base al giocatore
+
+        Heuristic heuristic;
+
         if (player.equalsIgnoreCase("white")) {
-            this.heuristic = new WhiteHeuristic();
+            heuristic = new WhiteHeuristic();
         } else {
-            this.heuristic = new BlackHeuristic();
+            heuristic = new BlackHeuristic();
         }
         this.searchAlgorithm = new IterativeDeepeningAlphaBetaSearch(heuristic);
     }
 
     @Override
     public void run() {
-        // Loop principale del client
+
+        try {
+            this.declareName();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("You are player " + this.getPlayer().toString() + "!");
+
         while (true) {
-            System.out.println("dnetro while run");
+            System.out.println("iteration");
             try {
-                this.read();
+
+                System.out.println("leggo");
+                try {
+                    this.read();
+                } catch (ClassNotFoundException | IOException e1) {
+
+                    e1.printStackTrace();
+                    System.exit(1);
+                }
+                System.out.println("non leggo più");
+
                 State state = this.getCurrentState();
 
+                System.out.println("Stato: " + state);
+                System.out.println("Stato turno: " + state.getTurn());
+                System.out.println("Get player: " + this.getPlayer().toString().toUpperCase());
+
                 if (state.getTurn().equalsTurn(this.getPlayer().toString().toUpperCase())) {
-                    // Gestione del tempo
+
+                    System.out.println("Cerco mossa...");
+
                     long startTime = System.currentTimeMillis();
-                    long timeLimit = this.timeout * 1000 - 2000; // Margine di 2 secondi
+                    long timeLimit = this.timeout * 1000L - 2000;
                     Action bestAction = searchAlgorithm.makeDecision(state, startTime, timeLimit);
+
+                    System.out.println("Trovato mossa...");
 
                     // Invia la mossa al server
                     this.write(bestAction);
@@ -54,16 +82,14 @@ public class TheGoatClient extends TablutClient {
     }
 
     public static void main(String[] args) {
-        String role = "";
-        String name = "TheGoatClient";
-        int timeout = 60;
+        String role = "white";
+        String name = "AltTablut";
+        int timeout = 10;
         String ipAddress = "localhost";
 
         if (args.length < 1) {
-            // System.out.println("Usage: java TheGoatClient <role> [<timeout>] [<ip-address>]");
-            // System.exit(-1);
-            System.out.println("fanculo args");
-            role = "white";
+             System.out.println("Usage: java TheGoatClient <role> [<timeout>] [<ip-address>]");
+//             System.exit(-1);
         } else {
             role = args[0];
             if (args.length >= 2) {

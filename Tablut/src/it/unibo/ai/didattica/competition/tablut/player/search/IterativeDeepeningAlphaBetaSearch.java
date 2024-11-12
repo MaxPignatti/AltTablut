@@ -8,7 +8,7 @@ import java.util.List;
 
 public class IterativeDeepeningAlphaBetaSearch {
 
-    private Heuristic heuristic;
+    private final Heuristic heuristic;
     private long timeLimit;
     private long startTime;
 
@@ -24,8 +24,10 @@ public class IterativeDeepeningAlphaBetaSearch {
         int depth = 1;
 
         while (System.currentTimeMillis() - startTime < timeLimit) {
+            System.out.println("Depth: " + depth);
             try {
                 bestAction = alphaBetaSearch(state, depth);
+                System.out.println("Best action: " + bestAction);
                 depth++;
             } catch (TimeOutException e) {
                 System.out.println("Tempo scaduto alla profondità " + depth);
@@ -43,7 +45,10 @@ public class IterativeDeepeningAlphaBetaSearch {
         double bestValue = Double.NEGATIVE_INFINITY;
 
         List<Action> actions = getLegalActions(state);
+        System.out.println(actions.size());
         actions = MoveOrdering.orderMoves(state, actions);
+        System.out.println(actions.size());
+
 
         for (Action action : actions) {
             checkTime();
