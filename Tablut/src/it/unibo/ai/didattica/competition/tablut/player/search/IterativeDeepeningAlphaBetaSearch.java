@@ -3,7 +3,6 @@ package it.unibo.ai.didattica.competition.tablut.player.search;
 import it.unibo.ai.didattica.competition.tablut.domain.*;
 import it.unibo.ai.didattica.competition.tablut.player.search.heuristics.*;
 import it.unibo.ai.didattica.competition.tablut.util.*;
-
 import java.util.List;
 
 public class IterativeDeepeningAlphaBetaSearch {
@@ -45,6 +44,8 @@ public class IterativeDeepeningAlphaBetaSearch {
         double bestValue = Double.NEGATIVE_INFINITY;
 
         List<Action> actions = getLegalActions(state);
+        System.out.println("Legal actions : " + actions);
+
         System.out.println(actions.size());
         actions = MoveOrdering.orderMoves(state, actions);
         System.out.println(actions.size());

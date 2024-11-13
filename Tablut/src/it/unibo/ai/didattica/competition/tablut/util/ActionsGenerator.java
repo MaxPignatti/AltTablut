@@ -1,8 +1,6 @@
 package it.unibo.ai.didattica.competition.tablut.util;
 
 import it.unibo.ai.didattica.competition.tablut.domain.*;
-import it.unibo.ai.didattica.competition.tablut.domain.Action;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +16,8 @@ public class ActionsGenerator {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 State.Pawn pawn = board[i][j];
-                if ((player.equalsTurn("WHITE") && (pawn.equalsPawn("W") || pawn.equalsPawn("K"))) ||
-                    (player.equalsTurn("BLACK") && pawn.equalsPawn("B"))) {
+                if ((player.equalsTurn("W") && (pawn.equalsPawn("W") || pawn.equalsPawn("K"))) ||
+                    (player.equalsTurn("B") && pawn.equalsPawn("B"))) {
                     try {
                         actions.addAll(generateMovesForPawn(state, i, j));
                     } catch (IOException e) {
