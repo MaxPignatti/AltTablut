@@ -39,24 +39,37 @@ public class TheGoatClient extends TablutClient {
         System.out.println("You are player " + this.getPlayer().toString() + "!");
 
         while (true) {
-            System.out.println("iteration");
             try {
 
                 System.out.println("leggo");
                 try {
                     this.read();
                 } catch (ClassNotFoundException | IOException e1) {
-
                     e1.printStackTrace();
                     System.exit(1);
                 }
-                System.out.println("non leggo più");
 
                 State state = this.getCurrentState();
 
                 System.out.println("Stato: " + state);
                 System.out.println("Stato turno: " + state.getTurn());
                 System.out.println("Get player: " + this.getPlayer().toString().toUpperCase());
+
+                // ho vinto
+                if (state.getTurn().equals(StateTablut.Turn.WHITEWIN)) {
+                    System.out.println("YOU WIN!");
+                    System.exit(0);
+                }
+                // ho perso
+                else if (state.getTurn().equals(StateTablut.Turn.BLACKWIN)) {
+                    System.out.println("YOU LOSE!");
+                    System.exit(0);
+                }
+                // pareggio
+                else if (state.getTurn().equals(StateTablut.Turn.DRAW)) {
+                    System.out.println("DRAW!");
+                    System.exit(0);
+                }
 
                 if (state.getTurn().equalsTurn(this.getPlayer().toString().toUpperCase())) {
 
@@ -75,6 +88,9 @@ public class TheGoatClient extends TablutClient {
                     // Attende il turno dell'avversario
                     System.out.println("In attesa del turno avversario...");
                 }
+
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

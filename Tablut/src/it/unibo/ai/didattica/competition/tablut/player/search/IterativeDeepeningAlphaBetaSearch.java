@@ -130,8 +130,8 @@ public class IterativeDeepeningAlphaBetaSearch {
 
     private boolean isTerminal(State state) {
         // Verifica se lo stato è terminale
-        return state.getTurn().equalsTurn("WHITEWIN") ||
-               state.getTurn().equalsTurn("BLACKWIN") ||
-               state.getTurn().equalsTurn("DRAW");
+        return state.getTurn().equalsTurn("WW") ||
+               state.getTurn().equalsTurn("BW") ||
+               state.getTurn().equalsTurn("D");
     }
 }
