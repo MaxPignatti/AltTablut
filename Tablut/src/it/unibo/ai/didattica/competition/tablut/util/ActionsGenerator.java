@@ -91,27 +91,17 @@ public class ActionsGenerator {
             return false;
         }
 
-        // Get the type of square (normal, throne, or escape)
-        String position = state.getBox(rowTo, colTo);
-
-        // Define throne and escape squares
+        // Define escape squares
         int boardSize = state.getBoard().length;
-        int throneRow = boardSize / 2;
-        int throneCol = boardSize / 2;
-        boolean isThrone = rowTo == throneRow && colTo == throneCol;
         boolean isEscape = (rowTo == 0 || rowTo == boardSize - 1) && (colTo == 0 || colTo == boardSize - 1);
 
-        // Only the king can move onto the throne or escape squares
-        if ((isThrone || isEscape) && !pawn.equalsPawn("K")) {
+        // Only the king can move onto escape squares
+        if (isEscape && !pawn.equalsPawn("K")) {
             return false;
         }
 
-        // Pawns cannot pass through the throne or escape squares unless they are the king
-        if (!pawn.equalsPawn("K")) {
-            if (isPassingThroughRestrictedSquares(state, rowFrom, colFrom, rowTo, colTo)) {
-                return false;
-            }
-        }
+        // All pieces can move onto the throne square
+        // No need to restrict movement onto the throne
 
         return true;
     }
@@ -133,34 +123,5 @@ public class ActionsGenerator {
         }
 
         return true;
-    }
-
-    private static boolean isPassingThroughRestrictedSquares(State state, int rowFrom, int colFrom, int rowTo, int colTo) {
-        int rowStep = Integer.compare(rowTo, rowFrom);
-        int colStep = Integer.compare(colTo, colFrom);
-
-        int currentRow = rowFrom + rowStep;
-        int currentCol = colFrom + colStep;
-
-        int boardSize = state.getBoard().length;
-        int throneRow = boardSize / 2;
-        int throneCol = boardSize / 2;
-
-        while (currentRow != rowTo || currentCol != colTo) {
-            // Check for throne
-            if (currentRow == throneRow && currentCol == throneCol) {
-                return true;
-            }
-
-            // Check for escape squares
-            if ((currentRow == 0 || currentRow == boardSize - 1) && (currentCol == 0 || currentCol == boardSize - 1)) {
-                return true;
-            }
-
-            currentRow += rowStep;
-            currentCol += colStep;
-        }
-
-        return false;
     }
 }

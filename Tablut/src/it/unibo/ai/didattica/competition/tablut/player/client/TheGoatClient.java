@@ -51,10 +51,6 @@ public class TheGoatClient extends TablutClient {
 
                 State state = this.getCurrentState();
 
-                System.out.println("Stato: " + state);
-                System.out.println("Stato turno: " + state.getTurn());
-                System.out.println("Get player: " + this.getPlayer().toString().toUpperCase());
-
                 // ho vinto
                 if (state.getTurn().equals(StateTablut.Turn.WHITEWIN)) {
                     System.out.println("YOU WIN!");
@@ -117,7 +113,6 @@ public class TheGoatClient extends TablutClient {
         }
 
         try {
-            System.out.println("dentro try");
             TheGoatClient client = new TheGoatClient(role, name, timeout, ipAddress);
             client.run();
         } catch (IOException | ClassNotFoundException e) {

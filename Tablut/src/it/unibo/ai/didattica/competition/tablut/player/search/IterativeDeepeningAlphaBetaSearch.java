@@ -23,53 +23,54 @@ public class IterativeDeepeningAlphaBetaSearch {
         int depth = 1;
 
         while (System.currentTimeMillis() - startTime < timeLimit) {
-            System.out.println("Depth: " + depth);
-            bestAction = alphaBetaSearch(state, depth);
-            System.out.println("Best action: " + bestAction);
+            System.out.println("-------------Depth: " + depth);
+            try {
+                bestAction = alphaBetaSearch(state, depth);
+                System.out.println("-------------Best action at depth " + depth + ": " + bestAction);
+            } catch (TimeOutException e) {
+                System.out.println("Timeout occurred at depth " + depth);
+                break;
+            }
             depth++;
         }
 
         return bestAction;
     }
 
-    private Action alphaBetaSearch(State state, int depth) {
+    private Action alphaBetaSearch(State state, int depth) throws TimeOutException {
         double alpha = Double.NEGATIVE_INFINITY;
         double beta = Double.POSITIVE_INFINITY;
         Action bestAction = null;
         double bestValue = Double.NEGATIVE_INFINITY;
-    
-        List<Action> actions = getLegalActions(state);
-        System.out.println("Legal actions : " + actions);
-    
-        //System.out.println(actions.size());
-        actions = MoveOrdering.orderMoves(state, actions);
-        //System.out.println(actions.size());
 
-        try {
-            for (Action action : actions) {
-                checkTime(); 
-    
-                State nextState = applyAction(state, action);
-                double value = minValue(nextState, depth - 1, alpha, beta);
-    
-                if (value > bestValue) {
-                    bestValue = value;
-                    bestAction = action;
-                }
-    
-                alpha = Math.max(alpha, bestValue);
+        List<Action> actions = getLegalActions(state);
+        System.out.println("Legal actions: " + actions);
+
+//        actions = MoveOrdering.orderMoves(state, actions);
+
+        for (Action action : actions) {
+            checkTime();
+
+            State nextState = applyAction(state, action);
+            if (nextState == null) {
+                continue; // Skip invalid actions
             }
-        } catch (TimeOutException e) {
-            System.out.println("Timeout occurred, returning bestAction so far");
-            if (bestAction == null) {
-                System.out.println("best action null");
+            double value = minValue(nextState, depth - 1, alpha, beta);
+
+            if (value > bestValue) {
+                bestValue = value;
+                bestAction = action;
             }
-            return bestAction != null ? bestAction : actions.get(0);
+
+            alpha = Math.max(alpha, bestValue);
         }
-    
+
+        if (bestAction == null && !actions.isEmpty()) {
+            bestAction = actions.get(0); // Fallback to the first action if no better action was found
+        }
+
         return bestAction;
     }
-    
 
     private double maxValue(State state, int depth, double alpha, double beta) throws TimeOutException {
         checkTime();
@@ -82,6 +83,9 @@ public class IterativeDeepeningAlphaBetaSearch {
 
         for (Action action : actions) {
             State nextState = applyAction(state, action);
+            if (nextState == null) {
+                continue; // Skip invalid actions
+            }
             value = Math.max(value, minValue(nextState, depth - 1, alpha, beta));
             if (value >= beta) {
                 return value;
@@ -102,6 +106,9 @@ public class IterativeDeepeningAlphaBetaSearch {
 
         for (Action action : actions) {
             State nextState = applyAction(state, action);
+            if (nextState == null) {
+                continue; // Skip invalid actions
+            }
             value = Math.min(value, maxValue(nextState, depth - 1, alpha, beta));
             if (value <= alpha) {
                 return value;
@@ -113,31 +120,29 @@ public class IterativeDeepeningAlphaBetaSearch {
 
     private void checkTime() throws TimeOutException {
         if (System.currentTimeMillis() - startTime >= timeLimit) {
-            throw new TimeOutException("Tempo scaduto");
+            throw new TimeOutException("Time limit exceeded");
         }
     }
 
     private List<Action> getLegalActions(State state) {
-        // Implementazione della generazione delle mosse legali
         return ActionsGenerator.getLegalActions(state);
     }
 
     private State applyAction(State state, Action action) {
-        // Applicazione dell'azione allo stato corrente
         State newState = state.clone();
         GameAshtonTablut rules = new GameAshtonTablut(99, 0, "logs", "white", "black");
         try {
             newState = rules.checkMove(newState, action);
         } catch (Exception e) {
-            // Gestione delle eccezioni, ad esempio mossa illegale
+            // Invalid move, return null to indicate the action cannot be applied
+            return null;
         }
         return newState;
     }
 
     private boolean isTerminal(State state) {
-        // Verifica se lo stato è terminale
         return state.getTurn().equalsTurn("WW") ||
-               state.getTurn().equalsTurn("BW") ||
-               state.getTurn().equalsTurn("D");
+                state.getTurn().equalsTurn("BW") ||
+                state.getTurn().equalsTurn("D");
     }
 }
