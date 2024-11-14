@@ -24,49 +24,52 @@ public class IterativeDeepeningAlphaBetaSearch {
 
         while (System.currentTimeMillis() - startTime < timeLimit) {
             System.out.println("Depth: " + depth);
-            try {
-                bestAction = alphaBetaSearch(state, depth);
-                System.out.println("Best action: " + bestAction);
-                depth++;
-            } catch (TimeOutException e) {
-                System.out.println("Tempo scaduto alla profondità " + depth); //Non si può fare così: l'eccezione non permette la fine della funzione. Possiamo fare una variabile che ci dice se è timeout e inserirla nel for, così almeno ci restituisce una delle mosse migliori per quel momento :D    
-                if(bestAction==null){
-                    System.out.println("Best Action NULLO! Leggere commento sopra (è finita per noi)");
-                }
-                break;
-            }
+            bestAction = alphaBetaSearch(state, depth);
+            System.out.println("Best action: " + bestAction);
+            depth++;
         }
 
         return bestAction;
     }
 
-    private Action alphaBetaSearch(State state, int depth) throws TimeOutException {
+    private Action alphaBetaSearch(State state, int depth) {
         double alpha = Double.NEGATIVE_INFINITY;
         double beta = Double.POSITIVE_INFINITY;
         Action bestAction = null;
         double bestValue = Double.NEGATIVE_INFINITY;
-
+    
         List<Action> actions = getLegalActions(state);
         System.out.println("Legal actions : " + actions);
-
+    
         //System.out.println(actions.size());
-        //actions = MoveOrdering.orderMoves(state, actions);
+        actions = MoveOrdering.orderMoves(state, actions);
         //System.out.println(actions.size());
 
-
-        for (Action action : actions) {
-            checkTime();
-            State nextState = applyAction(state, action);
-            double value = minValue(nextState, depth - 1, alpha, beta);
-            if (value > bestValue) {
-                bestValue = value;
-                bestAction = action;
+        try {
+            for (Action action : actions) {
+                checkTime(); 
+    
+                State nextState = applyAction(state, action);
+                double value = minValue(nextState, depth - 1, alpha, beta);
+    
+                if (value > bestValue) {
+                    bestValue = value;
+                    bestAction = action;
+                }
+    
+                alpha = Math.max(alpha, bestValue);
             }
-            alpha = Math.max(alpha, bestValue);
+        } catch (TimeOutException e) {
+            System.out.println("Timeout occurred, returning bestAction so far");
+            if (bestAction == null) {
+                System.out.println("best action null");
+            }
+            return bestAction != null ? bestAction : actions.get(0);
         }
-
+    
         return bestAction;
     }
+    
 
     private double maxValue(State state, int depth, double alpha, double beta) throws TimeOutException {
         checkTime();
