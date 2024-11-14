@@ -29,7 +29,10 @@ public class IterativeDeepeningAlphaBetaSearch {
                 System.out.println("Best action: " + bestAction);
                 depth++;
             } catch (TimeOutException e) {
-                System.out.println("Tempo scaduto alla profondità " + depth);
+                System.out.println("Tempo scaduto alla profondità " + depth); //Non si può fare così: l'eccezione non permette la fine della funzione. Possiamo fare una variabile che ci dice se è timeout e inserirla nel for, così almeno ci restituisce una delle mosse migliori per quel momento :D    
+                if(bestAction==null){
+                    System.out.println("Best Action NULLO! Leggere commento sopra (è finita per noi)");
+                }
                 break;
             }
         }
@@ -46,9 +49,9 @@ public class IterativeDeepeningAlphaBetaSearch {
         List<Action> actions = getLegalActions(state);
         System.out.println("Legal actions : " + actions);
 
-        System.out.println(actions.size());
-        actions = MoveOrdering.orderMoves(state, actions);
-        System.out.println(actions.size());
+        //System.out.println(actions.size());
+        //actions = MoveOrdering.orderMoves(state, actions);
+        //System.out.println(actions.size());
 
 
         for (Action action : actions) {
