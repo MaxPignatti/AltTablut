@@ -31,7 +31,7 @@
     </target>
 
     <target name="server-jar">
-        <jar destfile="server.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="Executables/server.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="it.unibo.ai.didattica.competition.tablut.server.Server"/>
                 <attribute name="Class-Path" value="."/>
@@ -72,7 +72,7 @@
     </target>
 
     <target name="random-jar">
-        <jar destfile="random.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="Executables/random.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="it.unibo.ai.didattica.competition.tablut.client.TablutRandomClient"/>
                 <attribute name="Class-Path" value="."/>
@@ -112,7 +112,16 @@
     </target>
 
     <target name="goatclient">
-        <!-- <jar destfile="Executables/goatclient.jar" filesetmanifest="mergewithoutmain">
+        <java classname="it.unibo.ai.didattica.competition.tablut.player.client.TheGoatClient" fork="true">
+            <classpath>
+                <pathelement location="lib/gson-2.2.2.jar"/>
+                <pathelement location="build"/>
+            </classpath>
+        </java>
+    </target>
+
+    <target name="goatclient-jar">
+        <jar destfile="Executables/goatclient.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="it.unibo.ai.didattica.competition.tablut.player.client.TheGoatClient"/>
                 <attribute name="Class-Path" value="."/>
@@ -120,16 +129,7 @@
             <fileset dir="build"/>
             <zipfileset excludes="META-INF/*.SF" src="lib/gson-2.2.2.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="lib/commons-cli-1.4.jar"/>
-        </jar> -->
-        <java classname="it.unibo.ai.didattica.competition.tablut.player.client.TheGoatClient" fork="true">
-            <classpath>
-                <pathelement location="lib/gson-2.2.2.jar"/>
-                <pathelement location="build"/>
-            </classpath>
-
-
-        </java>
+        </jar>
     </target>
-
 
 </project>
