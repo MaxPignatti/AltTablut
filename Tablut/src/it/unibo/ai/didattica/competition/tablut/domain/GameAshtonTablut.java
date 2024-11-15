@@ -81,7 +81,7 @@ public class GameAshtonTablut implements Game {
 		loggGame.fine("Players:\t" + whiteName + "\tvs\t" + blackName);
 		loggGame.fine("Repeated moves allowed:\t" + repeated_moves_allowed + "\tCache:\t" + cache_size);
 		loggGame.fine("Inizio partita");
-		//loggGame.fine("Stato:\n" + state.toString());
+		loggGame.fine("Stato:\n" + state.toString());
 		drawConditions = new ArrayList<State>();
 		this.citadels = new ArrayList<String>();
 		// this.strangeCitadels = new ArrayList<String>();

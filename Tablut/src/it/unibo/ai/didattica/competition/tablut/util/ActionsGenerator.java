@@ -3,9 +3,34 @@ package it.unibo.ai.didattica.competition.tablut.util;
 import it.unibo.ai.didattica.competition.tablut.domain.*;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ActionsGenerator {
+
+    // Definiamo le coordinate delle citadelle (campi)
+    private static final Set<String> citadels = new HashSet<>();
+
+    static {
+        // Coordinate delle citadelle
+        citadels.add("a4");
+        citadels.add("a5");
+        citadels.add("a6");
+        citadels.add("b5");
+        citadels.add("i4");
+        citadels.add("i5");
+        citadels.add("i6");
+        citadels.add("h5");
+        citadels.add("d1");
+        citadels.add("e1");
+        citadels.add("f1");
+        citadels.add("e2");
+        citadels.add("d9");
+        citadels.add("e9");
+        citadels.add("f9");
+        citadels.add("e8");
+    }
 
     public static List<Action> getLegalActions(State state) {
         List<Action> actions = new ArrayList<>();
@@ -35,7 +60,7 @@ public class ActionsGenerator {
         String from = state.getBox(row, col);
         State.Pawn pawn = state.getPawn(row, col);
 
-        // Movement upwards
+        // Movimento verso l'alto
         for (int i = row - 1; i >= 0; i--) {
             if (isValidMove(state, row, col, i, col, pawn)) {
                 String to = state.getBox(i, col);
@@ -45,7 +70,7 @@ public class ActionsGenerator {
             }
         }
 
-        // Movement downwards
+        // Movimento verso il basso
         for (int i = row + 1; i < state.getBoard().length; i++) {
             if (isValidMove(state, row, col, i, col, pawn)) {
                 String to = state.getBox(i, col);
@@ -55,7 +80,7 @@ public class ActionsGenerator {
             }
         }
 
-        // Movement left
+        // Movimento verso sinistra
         for (int j = col - 1; j >= 0; j--) {
             if (isValidMove(state, row, col, row, j, pawn)) {
                 String to = state.getBox(row, j);
@@ -65,7 +90,7 @@ public class ActionsGenerator {
             }
         }
 
-        // Movement right
+        // Movimento verso destra
         for (int j = col + 1; j < state.getBoard().length; j++) {
             if (isValidMove(state, row, col, row, j, pawn)) {
                 String to = state.getBox(row, j);
@@ -79,29 +104,50 @@ public class ActionsGenerator {
     }
 
     private static boolean isValidMove(State state, int rowFrom, int colFrom, int rowTo, int colTo, State.Pawn pawn) {
-        // Check if the path is clear
+        // Controllo che il percorso sia libero
         if (!isPathClear(state, rowFrom, colFrom, rowTo, colTo)) {
             return false;
         }
 
         State.Pawn toPawn = state.getPawn(rowTo, colTo);
 
-        // The destination must be empty
+        // La destinazione deve essere vuota
         if (!toPawn.equalsPawn(State.Pawn.EMPTY.toString())) {
             return false;
         }
 
-        // Define escape squares
-        int boardSize = state.getBoard().length;
-        boolean isEscape = (rowTo == 0 || rowTo == boardSize - 1) && (colTo == 0 || colTo == boardSize - 1);
+        String fromBox = state.getBox(rowFrom, colFrom);
+        String toBox = state.getBox(rowTo, colTo);
 
-        // Only the king can move onto escape squares
-        if (isEscape && !pawn.equalsPawn("K")) {
+        // Definiamo le caselle speciali
+        boolean isThrone = isThrone(rowTo, colTo);
+        boolean isCitadel = citadels.contains(toBox);
+
+        // Il trono è una barriera, nessuno può entrarci o attraversarlo (nemmeno il re una volta uscito)
+        if (isThrone) {
             return false;
         }
 
-        // All pieces can move onto the throne square
-        // No need to restrict movement onto the throne
+        // I bianchi non possono entrare nelle citadelle
+        if (state.getTurn().equalsTurn("W") && isCitadel) {
+            return false;
+        }
+
+        // I neri, una volta usciti dalla citadella, non possono rientrarci
+        if (state.getTurn().equalsTurn("B")) {
+            boolean fromCitadel = citadels.contains(fromBox);
+            if (!fromCitadel && isCitadel) {
+                return false;
+            }
+        }
+
+        // Nessuno può passare attraverso il trono o citadelle (se non consentito)
+        if (!isPathPassable(state, rowFrom, colFrom, rowTo, colTo, pawn)) {
+            return false;
+        }
+
+        // Non è necessario un controllo speciale per le caselle di fuga (bordi), poiché qualsiasi pezzo può muoversi su di esse
+        // L'unica restrizione è data dalle citadelle, che sono già gestite
 
         return true;
     }
@@ -123,5 +169,49 @@ public class ActionsGenerator {
         }
 
         return true;
+    }
+
+    private static boolean isPathPassable(State state, int rowFrom, int colFrom, int rowTo, int colTo, State.Pawn pawn) {
+        int rowStep = Integer.compare(rowTo, rowFrom);
+        int colStep = Integer.compare(colTo, colFrom);
+
+        int currentRow = rowFrom + rowStep;
+        int currentCol = colFrom + colStep;
+
+        while (currentRow != rowTo || currentCol != colTo) {
+            String currentBox = state.getBox(currentRow, currentCol);
+
+            // Controllo se la casella è il trono
+            if (isThrone(currentRow, currentCol)) {
+                return false;
+            }
+
+            // Controllo se la casella è una citadella
+            if (citadels.contains(currentBox)) {
+                // I bianchi non possono passare attraverso le citadelle
+                if (state.getTurn().equalsTurn("W")) {
+                    return false;
+                }
+                // I neri non possono rientrare nelle citadelle una volta usciti
+                if (state.getTurn().equalsTurn("B")) {
+                    String fromBox = state.getBox(rowFrom, colFrom);
+                    boolean fromCitadel = citadels.contains(fromBox);
+                    if (!fromCitadel) {
+                        return false;
+                    }
+                }
+            }
+
+            currentRow += rowStep;
+            currentCol += colStep;
+        }
+
+        return true;
+    }
+
+    private static boolean isThrone(int row, int col) {
+        // Il trono si trova al centro della scacchiera
+        int size = 9; // Dimensione della scacchiera
+        return row == size / 2 && col == size / 2;
     }
 }
