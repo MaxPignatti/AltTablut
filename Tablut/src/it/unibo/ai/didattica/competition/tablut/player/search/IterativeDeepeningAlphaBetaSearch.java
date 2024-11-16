@@ -79,7 +79,7 @@ public class IterativeDeepeningAlphaBetaSearch {
         }
         double value = Double.NEGATIVE_INFINITY;
         List<Action> actions = getLegalActions(state);
-        actions = MoveOrdering.orderMoves(state, actions);
+        //actions = MoveOrdering.orderMoves(state, actions);
 
         for (Action action : actions) {
             State nextState = applyAction(state, action);
@@ -102,7 +102,7 @@ public class IterativeDeepeningAlphaBetaSearch {
         }
         double value = Double.POSITIVE_INFINITY;
         List<Action> actions = getLegalActions(state);
-        actions = MoveOrdering.orderMoves(state, actions);
+        //actions = MoveOrdering.orderMoves(state, actions);
 
         for (Action action : actions) {
             State nextState = applyAction(state, action);

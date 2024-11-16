@@ -1,12 +1,10 @@
 package it.unibo.ai.didattica.competition.tablut.player.client;
 
-import it.unibo.ai.didattica.competition.tablut.client.TablutRandomClient;
-import it.unibo.ai.didattica.competition.tablut.domain.*;
-import it.unibo.ai.didattica.competition.tablut.player.search.heuristics.*;
 import it.unibo.ai.didattica.competition.tablut.client.TablutClient;
+import it.unibo.ai.didattica.competition.tablut.domain.*;
 import it.unibo.ai.didattica.competition.tablut.player.search.IterativeDeepeningAlphaBetaSearch;
+import it.unibo.ai.didattica.competition.tablut.player.search.heuristics.*;
 import java.io.IOException;
-import java.net.UnknownHostException;
 
 public class TheGoatClient extends TablutClient {
 
