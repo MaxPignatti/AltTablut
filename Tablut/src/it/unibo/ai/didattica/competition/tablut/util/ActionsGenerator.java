@@ -9,27 +9,27 @@ import java.util.Set;
 
 public class ActionsGenerator {
 
-    // Definiamo le coordinate delle citadelle (campi)
-    private static final Set<String> citadels = new HashSet<>();
+    // Definiamo le coordinate dei campi
+    private static final Set<String> camps = new HashSet<>();
 
     static {
-        // Coordinate delle citadelle
-        citadels.add("a4");
-        citadels.add("a5");
-        citadels.add("a6");
-        citadels.add("b5");
-        citadels.add("i4");
-        citadels.add("i5");
-        citadels.add("i6");
-        citadels.add("h5");
-        citadels.add("d1");
-        citadels.add("e1");
-        citadels.add("f1");
-        citadels.add("e2");
-        citadels.add("d9");
-        citadels.add("e9");
-        citadels.add("f9");
-        citadels.add("e8");
+        // Coordinate dei campi
+        camps.add("a4");
+        camps.add("a5");
+        camps.add("a6");
+        camps.add("b5");
+        camps.add("i4");
+        camps.add("i5");
+        camps.add("i6");
+        camps.add("h5");
+        camps.add("d1");
+        camps.add("e1");
+        camps.add("f1");
+        camps.add("e2");
+        camps.add("d9");
+        camps.add("e9");
+        camps.add("f9");
+        camps.add("e8");
     }
 
     public static List<Action> getLegalActions(State state) {
@@ -121,33 +121,33 @@ public class ActionsGenerator {
 
         // Definiamo le caselle speciali
         boolean isThrone = isThrone(rowTo, colTo);
-        boolean isCitadel = citadels.contains(toBox);
+        boolean isCitadel = camps.contains(toBox);
 
         // Il trono è una barriera, nessuno può entrarci o attraversarlo (nemmeno il re una volta uscito)
         if (isThrone) {
             return false;
         }
 
-        // I bianchi non possono entrare nelle citadelle
+        // I bianchi non possono entrare nei campi
         if (state.getTurn().equalsTurn("W") && isCitadel) {
             return false;
         }
 
-        // I neri, una volta usciti dalla citadella, non possono rientrarci
+        // I neri, una volta usciti dei campi, non possono rientrarci
         if (state.getTurn().equalsTurn("B")) {
-            boolean fromCitadel = citadels.contains(fromBox);
+            boolean fromCitadel = camps.contains(fromBox);
             if (!fromCitadel && isCitadel) {
                 return false;
             }
         }
 
-        // Nessuno può passare attraverso il trono o citadelle (se non consentito)
+        // Nessuno può passare attraverso il trono o campi
         if (!isPathPassable(state, rowFrom, colFrom, rowTo, colTo, pawn)) {
             return false;
         }
 
         // Non è necessario un controllo speciale per le caselle di fuga (bordi), poiché qualsiasi pezzo può muoversi su di esse
-        // L'unica restrizione è data dalle citadelle, che sono già gestite
+        // L'unica restrizione è data dei campi, che sono già gestiti
 
         return true;
     }
@@ -186,16 +186,16 @@ public class ActionsGenerator {
                 return false;
             }
 
-            // Controllo se la casella è una citadella
-            if (citadels.contains(currentBox)) {
-                // I bianchi non possono passare attraverso le citadelle
+            // Controllo se la casella è un campo
+            if (camps.contains(currentBox)) {
+                // I bianchi non possono passare attraverso i campi
                 if (state.getTurn().equalsTurn("W")) {
                     return false;
                 }
-                // I neri non possono rientrare nelle citadelle una volta usciti
+                // I neri non possono rientrare nei campi una volta usciti
                 if (state.getTurn().equalsTurn("B")) {
                     String fromBox = state.getBox(rowFrom, colFrom);
-                    boolean fromCitadel = citadels.contains(fromBox);
+                    boolean fromCitadel = camps.contains(fromBox);
                     if (!fromCitadel) {
                         return false;
                     }
