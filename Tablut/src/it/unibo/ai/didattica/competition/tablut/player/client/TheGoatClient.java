@@ -38,8 +38,6 @@ public class TheGoatClient extends TablutClient {
 
         while (true) {
             try {
-
-                System.out.println("leggo");
                 try {
                     this.read();
                 } catch (ClassNotFoundException | IOException e1) {
@@ -49,17 +47,22 @@ public class TheGoatClient extends TablutClient {
 
                 State state = this.getCurrentState();
 
-                // ho vinto
                 if (state.getTurn().equals(StateTablut.Turn.WHITEWIN)) {
-                    System.out.println("YOU WIN!");
+                    if(this.getPlayer().toString().equals("W"))
+                        System.out.println("YOU WIN!");
+                    else
+                        System.out.println("YOU LOSE!");
+
                     System.exit(0);
                 }
-                // ho perso
                 else if (state.getTurn().equals(StateTablut.Turn.BLACKWIN)) {
-                    System.out.println("YOU LOSE!");
+                    if(this.getPlayer().toString().equals("B"))
+                        System.out.println("YOU WIN!");
+                    else
+                        System.out.println("YOU LOSE!");
+
                     System.exit(0);
                 }
-                // pareggio
                 else if (state.getTurn().equals(StateTablut.Turn.DRAW)) {
                     System.out.println("DRAW!");
                     System.exit(0);
