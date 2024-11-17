@@ -1,9 +1,9 @@
 package it.unibo.ai.didattica.competition.tablut.player.search;
 
 import it.unibo.ai.didattica.competition.tablut.domain.*;
+import it.unibo.ai.didattica.competition.tablut.player.game.*;
 import it.unibo.ai.didattica.competition.tablut.player.search.heuristics.*;
 import it.unibo.ai.didattica.competition.tablut.util.*;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -186,9 +186,9 @@ public class IterativeDeepeningAlphaBetaSearch {
     }
 
     private State applyAction(State state, Action action) {
-        GameAshtonTablut rules = new GameAshtonTablut(99, 0, "logs", "white", "black");
+        OurGameAshtonTablut rules = new OurGameAshtonTablut(99, 0, "logs", "white", "black");
         try {
-            State newState = rules.checkMove(state.clone(), action);
+            State newState = rules.movePawn(state.clone(), action); //Qui si può già mettere movePawn DIREI!
             return newState;
         } catch (Exception e) {
             // Mossa non valida, restituisce null per indicare che l'azione non può essere applicata
