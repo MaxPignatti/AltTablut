@@ -9,12 +9,12 @@ public class WhiteHeuristic implements Heuristic {
     @Override
     public double evaluate(State state) {
         // Se il Bianco ha vinto
-        if (state.getTurn().equalsTurn("WHITEWIN")) {
+        if (state.getTurn().equalsTurn("WW")) {
             return Double.POSITIVE_INFINITY;
         }
 
         // Se il Nero ha vinto
-        if (state.getTurn().equalsTurn("BLACKWIN")) {
+        if (state.getTurn().equalsTurn("BW")) {
             return Double.NEGATIVE_INFINITY;
         }
 
@@ -67,12 +67,14 @@ public class WhiteHeuristic implements Heuristic {
                 }
             }
         }
+
+        System.out.println("King not found!");
+        
         return null; // Il re non è stato trovato (non dovrebbe accadere)
     }
 
     private int minKingDistanceToEscape(State state, int kingRow, int kingCol) {
         int minDistance = Integer.MAX_VALUE;
-        int size = state.getBoard().length;
 
         // Le posizioni delle uscite sono le caselle sul bordo non occupate dalle citadelle
         List<int[]> escapePositions = HeuristicUtils.getEscapePositions(state);
@@ -117,7 +119,7 @@ public class WhiteHeuristic implements Heuristic {
             String box = state.getBox(currentRow, currentCol);
 
             // Se incontriamo un pezzo o una casella proibita, il percorso non è libero
-            if (!pawn.equalsPawn(State.Pawn.EMPTY.toString()) || HeuristicUtils.isCitadel(box) || HeuristicUtils.isThrone(currentRow, currentCol)) {
+            if (!pawn.equalsPawn(State.Pawn.EMPTY.toString()) || HeuristicUtils.isCamp(box) || HeuristicUtils.isThrone(currentRow, currentCol)) {
                 return false;
             }
 
@@ -180,7 +182,7 @@ public class WhiteHeuristic implements Heuristic {
         State.Pawn pawn = state.getPawn(row, col);
         String box = state.getBox(row, col);
 
-        return pawn.equalsPawn(State.Pawn.EMPTY.toString()) && !HeuristicUtils.isCitadel(box) && !HeuristicUtils.isThrone(row, col);
+        return pawn.equalsPawn(State.Pawn.EMPTY.toString()) && !HeuristicUtils.isCamp(box) && !HeuristicUtils.isThrone(row, col);
     }
 
     private int numberOfThreatsToKing(State state, int kingRow, int kingCol) {

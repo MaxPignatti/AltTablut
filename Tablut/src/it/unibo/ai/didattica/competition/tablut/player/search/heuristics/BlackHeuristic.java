@@ -9,12 +9,12 @@ public class BlackHeuristic implements Heuristic {
     @Override
     public double evaluate(State state) {
         // Se il Nero ha vinto
-        if (state.getTurn().equalsTurn("BLACKWIN")) {
+        if (state.getTurn().equalsTurn("BW")) {
             return Double.POSITIVE_INFINITY;
         }
 
         // Se il Bianco ha vinto
-        if (state.getTurn().equalsTurn("WHITEWIN")) {
+        if (state.getTurn().equalsTurn("WW")) {
             return Double.NEGATIVE_INFINITY;
         }
 
@@ -68,7 +68,6 @@ public class BlackHeuristic implements Heuristic {
 
     private int minKingDistanceToEscape(State state, int kingRow, int kingCol) {
         int minDistance = Integer.MAX_VALUE;
-        int size = state.getBoard().length;
 
         // Le posizioni delle uscite sono le caselle sul bordo non occupate dalle citadelle
         List<int[]> escapePositions = HeuristicUtils.getEscapePositions(state);
@@ -130,7 +129,7 @@ public class BlackHeuristic implements Heuristic {
         State.Pawn pawn = state.getPawn(row, col);
         String box = state.getBox(row, col);
 
-        return pawn.equalsPawn(State.Pawn.EMPTY.toString()) && !HeuristicUtils.isCitadel(box) && !HeuristicUtils.isThrone(row, col);
+        return pawn.equalsPawn(State.Pawn.EMPTY.toString()) && !HeuristicUtils.isCamp(box) && !HeuristicUtils.isThrone(row, col);
     }
 
     private int numberOfThreatsToKing(State state, int kingRow, int kingCol) {
