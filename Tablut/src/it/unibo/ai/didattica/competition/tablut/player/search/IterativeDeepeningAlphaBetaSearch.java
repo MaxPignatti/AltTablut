@@ -24,9 +24,9 @@ public class IterativeDeepeningAlphaBetaSearch {
         super();
         
         if (player.equals("WHITE")) {
-            playerCoefficient = -1;
-        } else if (player.equals("BLACK")) {
             playerCoefficient = 1;
+        } else if (player.equals("BLACK")) {
+            playerCoefficient = -1;
         }
 
         this.heuristic = new Heuristic();
