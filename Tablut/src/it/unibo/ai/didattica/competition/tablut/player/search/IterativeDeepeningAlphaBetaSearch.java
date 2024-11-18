@@ -41,8 +41,9 @@ public class IterativeDeepeningAlphaBetaSearch {
             try {
                 bestAction = alphaBetaSearch(state, actions, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
-                System.out.println("Profondità: " + this.currentDepthLimit + " - Azione: " + bestAction + " - Valutazione: " + heuristic.evaluate(applyAction(state, bestAction)));
-                
+                System.out.println("Profondità: " + this.currentDepthLimit + " - Azione: " + bestAction + " - Valutazione: " + heuristic.evaluate(applyAction(state, bestAction), false));
+                heuristic.evaluate(applyAction(state, bestAction), true); // QUESTO È FATTO SOLO PER STAMPARE I VALORI DELL'EVAL
+
             } catch (TimeOutException e) {
                 System.out.println("Timeout alla profondità " + this.currentDepthLimit);
                 break;
@@ -100,7 +101,7 @@ public class IterativeDeepeningAlphaBetaSearch {
         checkTime();
 
         if (isTerminal(state) || depth > this.currentDepthLimit) {
-            return playerCoefficient * heuristic.evaluate(state);
+            return playerCoefficient * heuristic.evaluate(state, false);
         }
 
         double value = Double.NEGATIVE_INFINITY;
@@ -128,7 +129,7 @@ public class IterativeDeepeningAlphaBetaSearch {
         checkTime();
 
         if (isTerminal(state) || depth > this.currentDepthLimit) {
-            return playerCoefficient * heuristic.evaluate(state);
+            return playerCoefficient * heuristic.evaluate(state, false);
         }
 
         double value = Double.POSITIVE_INFINITY;
