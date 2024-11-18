@@ -15,14 +15,7 @@ public class TheGoatClient extends TablutClient {
         super(player, name, ipAddress);
         this.timeout = timeout;
 
-        Heuristic heuristic;
-
-        if (player.equalsIgnoreCase("white")) {
-            heuristic = new WhiteHeuristic();
-        } else {
-            heuristic = new BlackHeuristic();
-        }
-        this.searchAlgorithm = new IterativeDeepeningAlphaBetaSearch(heuristic);
+        this.searchAlgorithm = new IterativeDeepeningAlphaBetaSearch(player);
     }
 
     @Override
