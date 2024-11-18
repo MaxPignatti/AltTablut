@@ -6,7 +6,6 @@ import it.unibo.ai.didattica.competition.tablut.player.search.heuristics.*;
 import it.unibo.ai.didattica.competition.tablut.util.*;
 import java.util.*;
 
-
 public class IterativeDeepeningAlphaBetaSearch {
 
     private final Heuristic heuristic;
@@ -37,7 +36,6 @@ public class IterativeDeepeningAlphaBetaSearch {
 
         List<Action> actions = getLegalActions(state);
 
-        
         while (System.currentTimeMillis() - startTime < timeLimit) {
 
             try {
@@ -54,7 +52,6 @@ public class IterativeDeepeningAlphaBetaSearch {
 
         // QUI IN TEORIA NON DOVREBBE ENTRARCI
         if (bestAction == null) {
-            
             System.out.println("WARNING:    bestAction == null ");
             
             if (!actions.isEmpty()) {
@@ -90,10 +87,10 @@ public class IterativeDeepeningAlphaBetaSearch {
                 bestAction = action;
             }
 
-            // alpha = Math.max(alpha, bestValue);
-            // if (alpha >= beta) {
-            //     break; // Potatura beta
-            // }
+            alpha = Math.max(alpha, bestValue);
+            if (alpha >= beta) {
+                break; // Potatura beta
+            }
         }
 
         return bestAction;
@@ -118,10 +115,10 @@ public class IterativeDeepeningAlphaBetaSearch {
             
             value = Math.max(value, minValue(nextState, depth + 1, alpha, beta));
 
-            // alpha = Math.max(alpha, value);
-            // if (alpha >= beta) {
-            //     break; // Potatura beta
-            // } 
+            alpha = Math.max(alpha, value);
+            if (alpha >= beta) {
+                break; // Potatura beta
+            } 
         }
 
         return value;
@@ -145,10 +142,10 @@ public class IterativeDeepeningAlphaBetaSearch {
             }
             value = Math.min(value, maxValue(nextState, depth + 1, alpha, beta));
 
-            // beta = Math.min(beta, value);
-            // if (alpha >= beta) {
-            //     break; // Potatura alpha
-            // }
+            beta = Math.min(beta, value);
+            if (alpha >= beta) {
+                break; // Potatura alpha
+            }
         }
 
         return value;
