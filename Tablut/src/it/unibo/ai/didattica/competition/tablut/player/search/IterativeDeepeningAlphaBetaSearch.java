@@ -162,9 +162,9 @@ public class IterativeDeepeningAlphaBetaSearch {
     }
 
     private State applyAction(State state, Action action) {
-        OurGameAshtonTablut rules = new OurGameAshtonTablut("white", "black"); // TODO: make everything static
+        // OurGameAshtonTablut rules = new OurGameAshtonTablut("white", "black");
         try {
-            State newState = rules.checkMove(state.clone(), action);
+            State newState = OurGameAshtonTablut.checkMove(state.clone(), action);
             return newState;
         } catch (Exception e) {
             // Mossa non valida, restituisce null per indicare che l'azione non può essere applicata
