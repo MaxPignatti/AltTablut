@@ -127,14 +127,11 @@ public class IterativeDeepeningAlphaBetaSearch {
                 continue; // Salta azioni non valide
             }
             value = Math.max(value, minValue(nextState, depth + 1, alpha, beta));
-            // alpha = Math.max(alpha, value);
-            // if (alpha >= beta) {
-            //     break; // Potatura beta
-            // }
-
-            if (value >= beta) {
-                return value;
-            }
+              
+            alpha = Math.max(alpha, value);
+            if (alpha >= beta) {
+                break; // Potatura beta
+            } 
         }
 
         return value;
@@ -157,13 +154,9 @@ public class IterativeDeepeningAlphaBetaSearch {
                 continue; // Salta azioni non valide
             }
             value = Math.min(value, maxValue(nextState, depth + 1, alpha, beta));
-            // beta = Math.min(beta, value);
-            // if (alpha >= beta) {
-            //     break; // Potatura alpha
-            // }
-
-            if (value <= alpha) {
-                return value;
+            beta = Math.min(beta, value);
+            if (alpha >= beta) {
+                break; // Potatura alpha
             }
         }
 
