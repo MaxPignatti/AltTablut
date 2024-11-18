@@ -56,14 +56,14 @@ public class Heuristic {
 
         // Valutazione complessiva
         value += whitePawns * 100;          // Peso per le pedine bianche
-        value -= blackPawns * 100;           // Peso per le pedine nere
-        value -= kingDistance * 50;        // Più vicino all'uscita, meglio è per il bianco
+        value -= blackPawns * 60;           // Peso per le pedine nere
+        value -= kingDistance * 50;         // Più vicino all'uscita, meglio è per il bianco
         value += openEscapes * 300;         // Più vie di fuga aperte, meglio è per il bianco
         value += kingMobility * 50;         // Più mobilità per il re, meglio è per il bianco
         value += centerControl * 30;        // Controllo del centro
         value -= threatsToKing * 500;       // Penalità per minacce al re
         value -= escapesBlocked * 200;      // Più uscite bloccate, peggio è per il bianco
-        value -= blackNearKing * 200; // Penalize based on the number of black pawns near the king
+        value -= blackNearKing * 200;       // Penalize based on the number of black pawns near the king
 
         return value;
     }
