@@ -3,7 +3,6 @@ package it.unibo.ai.didattica.competition.tablut.player.client;
 import it.unibo.ai.didattica.competition.tablut.client.TablutClient;
 import it.unibo.ai.didattica.competition.tablut.domain.*;
 import it.unibo.ai.didattica.competition.tablut.player.search.IterativeDeepeningAlphaBetaSearch;
-import it.unibo.ai.didattica.competition.tablut.player.search.heuristics.*;
 import java.io.IOException;
 
 public class TheGoatClient extends TablutClient {

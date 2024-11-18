@@ -50,6 +50,10 @@ public class Heuristic {
         // Numero di vie di fuga aperte per il re
         int openEscapes = numberOfOpenEscapes(state, kingRow, kingCol);
 
+        int blackNearKing = blackPawnsNearKing(state, kingRow, kingCol);
+
+
+
         // Valutazione complessiva
         value += whitePawns * 100;          // Peso per le pedine bianche
         value -= blackPawns * 100;           // Peso per le pedine nere
@@ -59,9 +63,32 @@ public class Heuristic {
         value += centerControl * 30;        // Controllo del centro
         value -= threatsToKing * 500;       // Penalità per minacce al re
         value -= escapesBlocked * 200;      // Più uscite bloccate, peggio è per il bianco
+        value -= blackNearKing * 200; // Penalize based on the number of black pawns near the king
 
         return value;
     }
+
+    private int blackPawnsNearKing(State state, int kingRow, int kingCol) {
+        int count = 0;
+        // Check for black pawns within a certain radius of the king
+        for (int i = kingRow - 2; i <= kingRow + 2; i++) {
+            for (int j = kingCol - 2; j <= kingCol + 2; j++) {
+                if (isValidPosition(state, i, j)) {
+                    State.Pawn pawn = state.getPawn(i, j);
+                    if (pawn.equalsPawn(State.Pawn.BLACK.toString())) {
+                        count++;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+    
+    private boolean isValidPosition(State state, int row, int col) {
+        int size = state.getBoard().length;
+        return row >= 0 && row < size && col >= 0 && col < size;
+    }
+    
 
     private int[] findKing(State state) {
         int[] position = new int[2];

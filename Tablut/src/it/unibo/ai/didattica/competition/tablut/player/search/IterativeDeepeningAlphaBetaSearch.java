@@ -5,7 +5,7 @@ import it.unibo.ai.didattica.competition.tablut.player.game.*;
 import it.unibo.ai.didattica.competition.tablut.player.search.heuristics.*;
 import it.unibo.ai.didattica.competition.tablut.util.*;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+
 
 public class IterativeDeepeningAlphaBetaSearch {
 
@@ -13,25 +13,23 @@ public class IterativeDeepeningAlphaBetaSearch {
     private long timeLimit;
     private long startTime;
     private int playerCoefficient;
-
-    // Tabella di trasposizione per memorizzare gli stati già valutati
-    private Map<String, Double> transpositionTable;
+    private int currentDepthLimit;
 
     // Move Ordering: memorizza la migliore mossa trovata per stato
     private Map<String, Action> bestMoves; // QUI DOVREMMO ORDINARE IN BASE ALL'ULTIMA EVALUATION
 
     public IterativeDeepeningAlphaBetaSearch(String player) {
         super();
-        
+        player = player.toUpperCase();
         if (player.equals("WHITE")) {
-            playerCoefficient = 1;
-        } else if (player.equals("BLACK")) {
+            
             playerCoefficient = -1;
+        } else if (player.equals("BLACK")) {
+            playerCoefficient = 1;
         }
 
         this.heuristic = new Heuristic();
 
-        this.transpositionTable = new ConcurrentHashMap<>();
         this.bestMoves = new HashMap<>();
     }
 
@@ -41,22 +39,25 @@ public class IterativeDeepeningAlphaBetaSearch {
 
         Action bestAction = null;
 
-        int depth = 1;
+        this.currentDepthLimit = 1;
 
         List<Action> actions = getLegalActions(state);
 
+        
         while (System.currentTimeMillis() - startTime < timeLimit) {
-            
+
             try {
-                bestAction = alphaBetaSearch(state, actions, depth, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+                bestAction = alphaBetaSearch(state, actions, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+
+                System.out.println("Profondità: " + this.currentDepthLimit + " - Azione: " + bestAction + " - Valutazione: " + heuristic.evaluate(applyAction(state, bestAction)));
                 
                 // Salva la migliore mossa per lo stato attuale
                 bestMoves.put(state.toString(), bestAction);
             } catch (TimeOutException e) {
-                System.out.println("Timeout alla profondità " + depth);
+                System.out.println("Timeout alla profondità " + this.currentDepthLimit);
                 break;
             }
-            depth++;
+            this.currentDepthLimit++;
         }
 
         // QUI IN TEORIA NON DOVREBBE ENTRARCI
@@ -77,10 +78,7 @@ public class IterativeDeepeningAlphaBetaSearch {
         return bestAction;
     }
 
-    private Action alphaBetaSearch(State state, List<Action> actions, int depth, double alpha, double beta) throws TimeOutException {
-
-        // Move Ordering: ordina le mosse utilizzando la migliore mossa precedente
-        actions = orderMoves(state, actions);
+    private Action alphaBetaSearch(State state, List<Action> actions, double alpha, double beta) throws TimeOutException {
 
         Action bestAction = null;
         double bestValue = Double.NEGATIVE_INFINITY;
@@ -93,7 +91,7 @@ public class IterativeDeepeningAlphaBetaSearch {
                 continue; // Salta azioni non valide
             }
 
-            double value = minValue(nextState, depth - 1, alpha, beta);
+            double value = minValue(nextState, 1, alpha, beta);
 
             if (value > bestValue) { // GIUSTO METTERE > OPPURE SERVE < ???
                 bestValue = value;
@@ -115,74 +113,60 @@ public class IterativeDeepeningAlphaBetaSearch {
     private double maxValue(State state, int depth, double alpha, double beta) throws TimeOutException {
         checkTime();
 
-        if (isTerminal(state) || depth == 0) {
+        if (isTerminal(state) || depth > this.currentDepthLimit) {
             return playerCoefficient * heuristic.evaluate(state);
-        }
-
-        String stateKey = state.toString();
-
-        // Controlla la tabella di trasposizione
-        if (transpositionTable.containsKey(stateKey)) {
-            return transpositionTable.get(stateKey);
         }
 
         double value = Double.NEGATIVE_INFINITY;
 
         List<Action> actions = getLegalActions(state);
 
-        // Move Ordering: ordina le mosse utilizzando la migliore mossa precedente
-        actions = orderMoves(state, actions);
-
         for (Action action : actions) {
             State nextState = applyAction(state, action);
             if (nextState == null) {
                 continue; // Salta azioni non valide
             }
-            value = Math.max(value, minValue(nextState, depth - 1, alpha, beta));
-            alpha = Math.max(alpha, value);
-            if (alpha >= beta) {
-                break; // Potatura beta
+            value = Math.max(value, minValue(nextState, depth + 1, alpha, beta));
+            // alpha = Math.max(alpha, value);
+            // if (alpha >= beta) {
+            //     break; // Potatura beta
+            // }
+
+            if (value >= beta) {
+                return value;
             }
         }
 
-        transpositionTable.put(stateKey, value); // Memorizza il valore valutato
         return value;
     }
 
     private double minValue(State state, int depth, double alpha, double beta) throws TimeOutException {
         checkTime();
 
-        if (isTerminal(state) || depth == 0) {
+        if (isTerminal(state) || depth > this.currentDepthLimit) {
             return playerCoefficient * heuristic.evaluate(state);
-        }
-
-        String stateKey = state.toString();
-
-        // Controlla la tabella di trasposizione
-        if (transpositionTable.containsKey(stateKey)) {
-            return transpositionTable.get(stateKey);
         }
 
         double value = Double.POSITIVE_INFINITY;
 
         List<Action> actions = getLegalActions(state);
 
-        // Move Ordering: ordina le mosse utilizzando la migliore mossa precedente
-        actions = orderMoves(state, actions);
-
         for (Action action : actions) {
             State nextState = applyAction(state, action);
             if (nextState == null) {
                 continue; // Salta azioni non valide
             }
-            value = Math.min(value, maxValue(nextState, depth - 1, alpha, beta));
-            beta = Math.min(beta, value);
-            if (alpha >= beta) {
-                break; // Potatura alpha
+            value = Math.min(value, maxValue(nextState, depth + 1, alpha, beta));
+            // beta = Math.min(beta, value);
+            // if (alpha >= beta) {
+            //     break; // Potatura alpha
+            // }
+
+            if (value <= alpha) {
+                return value;
             }
         }
 
-        transpositionTable.put(stateKey, value); // Memorizza il valore valutato
         return value;
     }
 
@@ -213,13 +197,4 @@ public class IterativeDeepeningAlphaBetaSearch {
                 state.getTurn().equalsTurn(State.Turn.DRAW.toString());
     }
 
-    // SPOSTA IN CIMA SOLO LA MOSSA MIGLIORE
-    private List<Action> orderMoves(State state, List<Action> actions) {
-        Action bestMove = bestMoves.get(state.toString());
-        if (bestMove != null && actions.contains(bestMove)) {
-            actions.remove(bestMove);
-            actions.add(0, bestMove);
-        }
-        return actions;
-    }
 }
