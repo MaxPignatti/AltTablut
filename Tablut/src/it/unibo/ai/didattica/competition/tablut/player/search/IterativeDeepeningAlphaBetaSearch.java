@@ -15,22 +15,16 @@ public class IterativeDeepeningAlphaBetaSearch {
     private int playerCoefficient;
     private int currentDepthLimit;
 
-    // Move Ordering: memorizza la migliore mossa trovata per stato
-    private Map<String, Action> bestMoves; // QUI DOVREMMO ORDINARE IN BASE ALL'ULTIMA EVALUATION
-
     public IterativeDeepeningAlphaBetaSearch(String player) {
         super();
         player = player.toUpperCase();
         if (player.equals("WHITE")) {
-            
-            playerCoefficient = -1;
-        } else if (player.equals("BLACK")) {
             playerCoefficient = 1;
+        } else if (player.equals("BLACK")) {
+            playerCoefficient = -1;
         }
 
         this.heuristic = new Heuristic();
-
-        this.bestMoves = new HashMap<>();
     }
 
     public Action makeDecision(State state, long startTime, long timeLimit) {
@@ -51,8 +45,6 @@ public class IterativeDeepeningAlphaBetaSearch {
 
                 System.out.println("Profondità: " + this.currentDepthLimit + " - Azione: " + bestAction + " - Valutazione: " + heuristic.evaluate(applyAction(state, bestAction)));
                 
-                // Salva la migliore mossa per lo stato attuale
-                bestMoves.put(state.toString(), bestAction);
             } catch (TimeOutException e) {
                 System.out.println("Timeout alla profondità " + this.currentDepthLimit);
                 break;
@@ -91,20 +83,17 @@ public class IterativeDeepeningAlphaBetaSearch {
                 continue; // Salta azioni non valide
             }
 
-            double value = minValue(nextState, 1, alpha, beta);
+            double value = maxValue(nextState, 1, alpha, beta);
 
-            if (value > bestValue) { // GIUSTO METTERE > OPPURE SERVE < ???
+            if (value > bestValue) { 
                 bestValue = value;
                 bestAction = action;
-
-                // Aggiorna la migliore mossa per il Move Ordering
-                bestMoves.put(state.toString(), bestAction);
             }
 
-            alpha = Math.max(alpha, bestValue);
-            if (alpha >= beta) {
-                break; // Potatura beta
-            }
+            // alpha = Math.max(alpha, bestValue);
+            // if (alpha >= beta) {
+            //     break; // Potatura beta
+            // }
         }
 
         return bestAction;
@@ -126,12 +115,13 @@ public class IterativeDeepeningAlphaBetaSearch {
             if (nextState == null) {
                 continue; // Salta azioni non valide
             }
+            
             value = Math.max(value, minValue(nextState, depth + 1, alpha, beta));
-              
-            alpha = Math.max(alpha, value);
-            if (alpha >= beta) {
-                break; // Potatura beta
-            } 
+
+            // alpha = Math.max(alpha, value);
+            // if (alpha >= beta) {
+            //     break; // Potatura beta
+            // } 
         }
 
         return value;
@@ -154,10 +144,11 @@ public class IterativeDeepeningAlphaBetaSearch {
                 continue; // Salta azioni non valide
             }
             value = Math.min(value, maxValue(nextState, depth + 1, alpha, beta));
-            beta = Math.min(beta, value);
-            if (alpha >= beta) {
-                break; // Potatura alpha
-            }
+
+            // beta = Math.min(beta, value);
+            // if (alpha >= beta) {
+            //     break; // Potatura alpha
+            // }
         }
 
         return value;
