@@ -104,7 +104,7 @@ public class ActionsGenerator {
     }
 
     private static boolean isValidMove(State state, int rowFrom, int colFrom, int rowTo, int colTo, State.Pawn pawn) {
-        // Controllo che il percorso sia libero
+        // Controllo che il percorso sia libero (contiene anche il controllo del trono in teoria)
         if (!isPathClear(state, rowFrom, colFrom, rowTo, colTo)) {
             return false;
         }
@@ -119,14 +119,7 @@ public class ActionsGenerator {
         String fromBox = state.getBox(rowFrom, colFrom);
         String toBox = state.getBox(rowTo, colTo);
 
-        // Definiamo le caselle speciali
-        boolean isThrone = isThrone(rowTo, colTo);
         boolean isCitadel = camps.contains(toBox);
-
-        // Il trono è una barriera, nessuno può entrarci o attraversarlo (nemmeno il re una volta uscito)
-        if (isThrone) {
-            return false;
-        }
 
         // I bianchi non possono entrare nei campi
         if (state.getTurn().equalsTurn("W") && isCitadel) {
@@ -140,14 +133,6 @@ public class ActionsGenerator {
                 return false;
             }
         }
-
-        // Nessuno può passare attraverso il trono o campi
-        if (!isPathPassable(state, rowFrom, colFrom, rowTo, colTo, pawn)) {
-            return false;
-        }
-
-        // Non è necessario un controllo speciale per le caselle di fuga (bordi), poiché qualsiasi pezzo può muoversi su di esse
-        // L'unica restrizione è data dei campi, che sono già gestiti
 
         return true;
     }
@@ -164,27 +149,8 @@ public class ActionsGenerator {
             if (!currentPawn.equalsPawn(State.Pawn.EMPTY.toString())) {
                 return false;
             }
-            currentRow += rowStep;
-            currentCol += colStep;
-        }
 
-        return true;
-    }
-
-    private static boolean isPathPassable(State state, int rowFrom, int colFrom, int rowTo, int colTo, State.Pawn pawn) {
-        int rowStep = Integer.compare(rowTo, rowFrom);
-        int colStep = Integer.compare(colTo, colFrom);
-
-        int currentRow = rowFrom + rowStep;
-        int currentCol = colFrom + colStep;
-
-        while (currentRow != rowTo || currentCol != colTo) {
             String currentBox = state.getBox(currentRow, currentCol);
-
-            // Controllo se la casella è il trono
-            if (isThrone(currentRow, currentCol)) {
-                return false;
-            }
 
             // Controllo se la casella è un campo
             if (camps.contains(currentBox)) {
@@ -192,8 +158,7 @@ public class ActionsGenerator {
                 if (state.getTurn().equalsTurn("W")) {
                     return false;
                 }
-                // I neri non possono rientrare nei campi una volta usciti
-                if (state.getTurn().equalsTurn("B")) {
+                else { // I neri non possono rientrare nei campi una volta usciti
                     String fromBox = state.getBox(rowFrom, colFrom);
                     boolean fromCitadel = camps.contains(fromBox);
                     if (!fromCitadel) {
@@ -205,13 +170,6 @@ public class ActionsGenerator {
             currentRow += rowStep;
             currentCol += colStep;
         }
-
         return true;
-    }
-
-    private static boolean isThrone(int row, int col) {
-        // Il trono si trova al centro della scacchiera
-        int size = 9; // Dimensione della scacchiera
-        return row == size / 2 && col == size / 2;
     }
 }
