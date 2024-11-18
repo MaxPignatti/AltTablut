@@ -8,6 +8,11 @@ import java.util.Set;
 
 public class HeuristicUtils {
 
+    // Explicit constructor
+    public HeuristicUtils() {
+        super();
+    }
+
     // Definiamo le coordinate delle citadelle (campi)
     private static final Set<String> camps = new HashSet<>();
 
@@ -74,4 +79,6 @@ public class HeuristicUtils {
 
         return escapes;
     }
+
+    
 }

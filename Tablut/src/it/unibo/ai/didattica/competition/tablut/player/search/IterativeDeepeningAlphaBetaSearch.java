@@ -9,10 +9,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class IterativeDeepeningAlphaBetaSearch {
 
-    private final Heuristic maxHeur;
-    private final Heuristic minHeur;
+    private final Heuristic heuristic;
     private long timeLimit;
     private long startTime;
+    private int playerCoefficient;
 
     // Tabella di trasposizione per memorizzare gli stati già valutati
     private Map<String, Double> transpositionTable;
@@ -21,14 +21,15 @@ public class IterativeDeepeningAlphaBetaSearch {
     private Map<String, Action> bestMoves; // QUI DOVREMMO ORDINARE IN BASE ALL'ULTIMA EVALUATION
 
     public IterativeDeepeningAlphaBetaSearch(String player) {
+        super();
         
-        if(player.equalsIgnoreCase("white")){
-            this.maxHeur = new BlackHeuristic();
-            this.minHeur = new WhiteHeuristic();
-        } else {
-            this.maxHeur = new WhiteHeuristic();
-            this.minHeur = new BlackHeuristic();
+        if (player.equals("WHITE")) {
+            playerCoefficient = -1;
+        } else if (player.equals("BLACK")) {
+            playerCoefficient = 1;
         }
+
+        this.heuristic = new Heuristic();
 
         this.transpositionTable = new ConcurrentHashMap<>();
         this.bestMoves = new HashMap<>();
@@ -115,7 +116,7 @@ public class IterativeDeepeningAlphaBetaSearch {
         checkTime();
 
         if (isTerminal(state) || depth == 0) {
-            return maxHeur.evaluate(state);
+            return playerCoefficient * heuristic.evaluate(state);
         }
 
         String stateKey = state.toString();
@@ -152,7 +153,7 @@ public class IterativeDeepeningAlphaBetaSearch {
         checkTime();
 
         if (isTerminal(state) || depth == 0) {
-            return minHeur.evaluate(state);
+            return playerCoefficient * heuristic.evaluate(state);
         }
 
         String stateKey = state.toString();
