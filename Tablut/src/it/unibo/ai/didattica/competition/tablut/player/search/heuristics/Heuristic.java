@@ -77,10 +77,10 @@ public class Heuristic {
             System.out.printf("White Pawns: %d -> +%d%n", whitePawns, whitePawns * 100);
             System.out.printf("Black Pawns: %d -> -%d%n", blackPawns, blackPawns * 60);
             System.out.printf("King Distance: %d -> -%d%n", kingDistance, kingDistance * 50);
-            System.out.printf("Open Escapes: %d -> +%d%n", openEscapes, openEscapes * 500);
+            System.out.printf("Open Escapes: %d -> +%d%n", openEscapes, openEscapes * 700);
             // System.out.printf("King Mobility: %d -> +%d%n", kingMobility, kingMobility * 50);
             // System.out.printf("Center Control: %d -> +%d%n", centerControl, centerControl * 30);
-            System.out.printf("Threats to King: %d -> -%d%n", threatsToKing, threatsToKing * 500);
+            System.out.printf("Threats to King: %d -> -%d%n", threatsToKing, threatsToKing * 700);
             System.out.printf("Escapes Blocked: %d -> -%d%n", escapesBlocked, escapesBlocked * 200);
             // System.out.printf("Black Near King: %d -> -%d%n", blackNearKing, blackNearKing * 200);
             System.out.println("Total Evaluation Value: " + value);

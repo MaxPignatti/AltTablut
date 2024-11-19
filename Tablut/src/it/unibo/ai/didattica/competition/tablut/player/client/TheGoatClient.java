@@ -65,7 +65,7 @@ public class TheGoatClient extends TablutClient {
                     System.out.println("Cerco mossa...");
 
                     long startTime = System.currentTimeMillis();
-                    long timeLimit = this.timeout * 1000L - 2000;
+                    long timeLimit = this.timeout * 1000L - 1000;
                     Action bestAction = searchAlgorithm.makeDecision(state, startTime, timeLimit);
 
                     System.out.println("Trovato mossa...");

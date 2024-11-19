@@ -14,6 +14,13 @@ public class IterativeDeepeningAlphaBetaSearch {
     private int playerCoefficient;
     private int currentDepthLimit;
 
+    private String outputString = "";   
+
+    private Boolean flag1Boolean = true;
+    private Boolean flag2Boolean = true;
+    private Boolean flag3Boolean = true;
+
+
     public IterativeDeepeningAlphaBetaSearch(String player) {
         super();
         player = player.toUpperCase();
@@ -39,8 +46,11 @@ public class IterativeDeepeningAlphaBetaSearch {
         while (System.currentTimeMillis() - startTime < timeLimit) {
 
             try {
+                // outputString += "\nDepth: " + this.currentDepthLimit + "\n";
+
                 bestAction = alphaBetaSearch(state, actions, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
 
+                
                 System.out.println("Profondità: " + this.currentDepthLimit + " - Azione: " + bestAction + " - Valutazione: " + heuristic.evaluate(applyAction(state, bestAction), false));
                 heuristic.evaluate(applyAction(state, bestAction), true); // QUESTO È FATTO SOLO PER STAMPARE I VALORI DELL'EVAL
 
@@ -53,6 +63,7 @@ public class IterativeDeepeningAlphaBetaSearch {
                 System.out.println("ECCEZZIONE ASSURDA PAZZESCA IMPOSSIBLE");
                 System.out.println("ECCEZZIONE ASSURDA PAZZESCA IMPOSSIBLE");
                 System.out.println("ECCEZZIONE " + e);
+                break;
             }
             this.currentDepthLimit++;
         }
@@ -71,6 +82,8 @@ public class IterativeDeepeningAlphaBetaSearch {
             }
         }
 
+        System.out.println(outputString);
+
         return bestAction;
     }
 
@@ -82,12 +95,19 @@ public class IterativeDeepeningAlphaBetaSearch {
         for (Action action : actions) {
             checkTime();
 
+            if(flag1Boolean)
+                System.out.println("AZIONE 1: " + action);
+
+            flag1Boolean = false;
+
             State nextState = applyAction(state, action);
             if (nextState == null) {
                 continue; // Salta azioni non valide
             }
 
-            double value = maxValue(nextState, 1, alpha, beta);
+            double value = minValue(nextState, 1, alpha, beta);
+
+            // outputString += "Action: " + action + " - Value: " + value + "\n";
 
             if (value > bestValue) { 
                 bestValue = value;
@@ -95,6 +115,7 @@ public class IterativeDeepeningAlphaBetaSearch {
             }
 
             alpha = Math.max(alpha, bestValue);
+
             if (alpha >= beta) {
                 break; // Potatura beta
             }
@@ -114,12 +135,17 @@ public class IterativeDeepeningAlphaBetaSearch {
 
         List<Action> actions = getLegalActions(state);
 
+        if(flag2Boolean){
+            System.out.println("AZIONI2: " + actions);
+            flag2Boolean = false;
+        }
+
         for (Action action : actions) {
             State nextState = applyAction(state, action);
             if (nextState == null) {
                 continue; // Salta azioni non valide
             }
-            
+
             value = Math.max(value, minValue(nextState, depth + 1, alpha, beta));
 
             alpha = Math.max(alpha, value);
@@ -141,6 +167,11 @@ public class IterativeDeepeningAlphaBetaSearch {
         double value = Double.POSITIVE_INFINITY;
 
         List<Action> actions = getLegalActions(state);
+
+        if(flag3Boolean){
+            System.out.println("AZIONI3: " + actions);
+            flag3Boolean = false;
+        }
 
         for (Action action : actions) {
             State nextState = applyAction(state, action);
