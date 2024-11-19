@@ -56,24 +56,33 @@ public class Heuristic {
         value += whitePawns * 100;          // Peso per le pedine bianche
         value -= blackPawns * 60;           // Peso per le pedine nere
         value -= kingDistance * 50;         // Più vicino all'uscita, meglio è per il bianco
-        value += openEscapes * 300;         // Più vie di fuga aperte, meglio è per il bianco
-        value += kingMobility * 50;         // Più mobilità per il re, meglio è per il bianco
-        value += centerControl * 30;        // Controllo del centro
-        value -= threatsToKing * 500;       // Penalità per minacce al re
+        value += openEscapes * 700;         // Più vie di fuga aperte, meglio è per il bianco
+        //value += kingMobility * 50;         // Più mobilità per il re, meglio è per il bianco
+        //value += centerControl * 30;        // Controllo del centro
+        value -= threatsToKing * 700;       // Penalità per minacce al re
         value -= escapesBlocked * 200;      // Più uscite bloccate, peggio è per il bianco
-        value -= blackNearKing * 200;       // Penalize based on the number of black pawns near the king
+        // value -= blackNearKing * 200;       // Penalize based on the number of black pawns near the king
 
+
+        /*
+         * TODO:
+         * NON VENGONO CONSIDERATI I CAMPI E IL TRONO COME MINACCE AL RE E AI PEDONI
+         * 
+         * NON VALUTIAMO LE POSIZIONE DEI SINGOLI PEDONI NELL'EVALUATION, MEGLIO PERCHÈ COSÌ È PIÙ EFFICIENTE???
+         * 
+         */
+        
         if(printEval){
             System.out.println("Evaluation Details:");
             System.out.printf("White Pawns: %d -> +%d%n", whitePawns, whitePawns * 100);
             System.out.printf("Black Pawns: %d -> -%d%n", blackPawns, blackPawns * 60);
             System.out.printf("King Distance: %d -> -%d%n", kingDistance, kingDistance * 50);
-            System.out.printf("Open Escapes: %d -> +%d%n", openEscapes, openEscapes * 300);
-            System.out.printf("King Mobility: %d -> +%d%n", kingMobility, kingMobility * 50);
-            System.out.printf("Center Control: %d -> +%d%n", centerControl, centerControl * 30);
+            System.out.printf("Open Escapes: %d -> +%d%n", openEscapes, openEscapes * 500);
+            // System.out.printf("King Mobility: %d -> +%d%n", kingMobility, kingMobility * 50);
+            // System.out.printf("Center Control: %d -> +%d%n", centerControl, centerControl * 30);
             System.out.printf("Threats to King: %d -> -%d%n", threatsToKing, threatsToKing * 500);
             System.out.printf("Escapes Blocked: %d -> -%d%n", escapesBlocked, escapesBlocked * 200);
-            System.out.printf("Black Near King: %d -> -%d%n", blackNearKing, blackNearKing * 200);
+            // System.out.printf("Black Near King: %d -> -%d%n", blackNearKing, blackNearKing * 200);
             System.out.println("Total Evaluation Value: " + value);
         }
 
@@ -165,7 +174,7 @@ public class Heuristic {
             String box = state.getBox(currentRow, currentCol);
 
             // Se incontriamo un pezzo o una casella proibita, il percorso non è libero
-            if (!pawn.equalsPawn(State.Pawn.EMPTY.toString()) || HeuristicUtils.isCamp(box) || HeuristicUtils.isThrone(currentRow, currentCol)) {
+            if (!pawn.equalsPawn(State.Pawn.EMPTY.toString()) || HeuristicUtils.isCamp(box)) {
                 return false;
             }
 
@@ -228,7 +237,7 @@ public class Heuristic {
         State.Pawn pawn = state.getPawn(row, col);
         String box = state.getBox(row, col);
 
-        return pawn.equalsPawn(State.Pawn.EMPTY.toString()) && !HeuristicUtils.isCamp(box) && !HeuristicUtils.isThrone(row, col);
+        return pawn.equalsPawn(State.Pawn.EMPTY.toString()) && !HeuristicUtils.isCamp(box);
     }
 
     private int numberOfThreatsToKing(State state, int kingRow, int kingCol) {

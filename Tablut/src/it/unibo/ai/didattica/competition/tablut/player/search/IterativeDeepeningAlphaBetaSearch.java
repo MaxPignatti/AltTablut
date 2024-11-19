@@ -47,6 +47,12 @@ public class IterativeDeepeningAlphaBetaSearch {
             } catch (TimeOutException e) {
                 System.out.println("Timeout alla profondità " + this.currentDepthLimit);
                 break;
+            } catch (Exception e ){
+                System.out.println("ECCEZZIONE ASSURDA PAZZESCA IMPOSSIBLE");
+                System.out.println("ECCEZZIONE ASSURDA PAZZESCA IMPOSSIBLE");
+                System.out.println("ECCEZZIONE ASSURDA PAZZESCA IMPOSSIBLE");
+                System.out.println("ECCEZZIONE ASSURDA PAZZESCA IMPOSSIBLE");
+                System.out.println("ECCEZZIONE " + e);
             }
             this.currentDepthLimit++;
         }
