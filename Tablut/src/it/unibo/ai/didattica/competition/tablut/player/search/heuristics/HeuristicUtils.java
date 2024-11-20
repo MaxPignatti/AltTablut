@@ -36,14 +36,27 @@ public class HeuristicUtils {
         camps.add("e8");
     }
 
+    public static int[][] escapes = {
+        {1, 0},
+        {2, 0},
+        {6, 0},
+        {7, 0},
+        {1, 8},
+        {2, 8},
+        {6, 8},
+        {7, 8},
+        {0, 1},
+        {0, 2},
+        {0, 6},
+        {0, 7},
+        {8, 1},
+        {8, 2},
+        {8, 6},
+        {8, 7}
+    };
+
     public static boolean isCamp(String box) {
         return camps.contains(box);
-    }
-
-    public static boolean isThrone(int row, int col) {
-        // Il trono si trova al centro della scacchiera
-        int size = 9; // Dimensione della scacchiera
-        return row == size / 2 && col == size / 2;
     }
 
     public static boolean isEscape(String box) {
@@ -56,29 +69,5 @@ public class HeuristicUtils {
 
         return isEdge && !isCamp(box);
     }
-
-    public static List<int[]> getEscapePositions(State state) {
-        List<int[]> escapes = new ArrayList<>();
-        int size = state.getBoard().length;
-
-        // Caselle sul bordo non occupate dalle citadelle
-        for (int i = 0; i < size; i++) {
-            if (!isCamp(state.getBox(0, i))) {
-                escapes.add(new int[]{0, i});
-            }
-            if (!isCamp(state.getBox(size -1, i))) {
-                escapes.add(new int[]{size -1, i});
-            }
-            if (!isCamp(state.getBox(i, 0))) {
-                escapes.add(new int[]{i, 0});
-            }
-            if (!isCamp(state.getBox(i, size -1))) {
-                escapes.add(new int[]{i, size -1});
-            }
-        }
-
-        return escapes;
-    }
-
     
 }

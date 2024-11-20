@@ -11,6 +11,7 @@ public class Heuristic {
     }
 
     public double evaluate(State state, boolean printEval) {
+
         // Se il Bianco ha vinto
         if (state.getTurn().equalsTurn("WW")) {
             return Double.POSITIVE_INFINITY;
@@ -32,82 +33,33 @@ public class Heuristic {
         int kingRow = kingPosition[0];
         int kingCol = kingPosition[1];
 
-        // Distanza minima del re dalle uscite
-        int kingDistance = minKingDistanceToEscape(state, kingRow, kingCol);
-
-        // Numero di mosse possibili per il re
-        int kingMobility = getKingMobility(state, kingRow, kingCol);
-
         // Minacce al re
         int threatsToKing = numberOfThreatsToKing(state, kingRow, kingCol);
 
         // Controllo delle uscite
         int escapesBlocked = numberOfEscapesBlocked(state);
 
-        // Controllo del centro
-        int centerControl = countWhiteInCenter(state);
-
         // Numero di vie di fuga aperte per il re
         int openEscapes = numberOfOpenEscapes(state, kingRow, kingCol);
 
-        int blackNearKing = blackPawnsNearKing(state, kingRow, kingCol);
-
         // Valutazione complessiva
-        value += whitePawns * 100;          // Peso per le pedine bianche
-        value -= blackPawns * 60;           // Peso per le pedine nere
-        value -= kingDistance * 50;         // Più vicino all'uscita, meglio è per il bianco
-        value += openEscapes * 700;         // Più vie di fuga aperte, meglio è per il bianco
-        //value += kingMobility * 50;         // Più mobilità per il re, meglio è per il bianco
-        //value += centerControl * 30;        // Controllo del centro
+        value += whitePawns * 120;          // Peso per le pedine bianche
+        value -= blackPawns * 70;           // Peso per le pedine nere
+        value += openEscapes * openEscapes * 700;         // Più vie di fuga aperte, meglio è per il bianco
         value -= threatsToKing * 700;       // Penalità per minacce al re
-        value -= escapesBlocked * 200;      // Più uscite bloccate, peggio è per il bianco
-        // value -= blackNearKing * 200;       // Penalize based on the number of black pawns near the king
+        value -= escapesBlocked * 150;      // Più uscite bloccate, peggio è per il bianco
 
-
-        /*
-         * TODO:
-         * NON VENGONO CONSIDERATI I CAMPI E IL TRONO COME MINACCE AL RE E AI PEDONI
-         * 
-         * NON VALUTIAMO LE POSIZIONE DEI SINGOLI PEDONI NELL'EVALUATION, MEGLIO PERCHÈ COSÌ È PIÙ EFFICIENTE???
-         * 
-         */
-        
         if(printEval){
             System.out.println("Evaluation Details:");
-            System.out.printf("White Pawns: %d -> +%d%n", whitePawns, whitePawns * 100);
-            System.out.printf("Black Pawns: %d -> -%d%n", blackPawns, blackPawns * 60);
-            System.out.printf("King Distance: %d -> -%d%n", kingDistance, kingDistance * 50);
-            System.out.printf("Open Escapes: %d -> +%d%n", openEscapes, openEscapes * 700);
-            // System.out.printf("King Mobility: %d -> +%d%n", kingMobility, kingMobility * 50);
-            // System.out.printf("Center Control: %d -> +%d%n", centerControl, centerControl * 30);
+            System.out.printf("White Pawns: %d -> +%d%n", whitePawns, whitePawns * 120);
+            System.out.printf("Black Pawns: %d -> -%d%n", blackPawns, blackPawns * 70);
+            System.out.printf("Open Escapes: %d -> +%d%n", openEscapes, openEscapes * openEscapes * 700);
             System.out.printf("Threats to King: %d -> -%d%n", threatsToKing, threatsToKing * 700);
-            System.out.printf("Escapes Blocked: %d -> -%d%n", escapesBlocked, escapesBlocked * 200);
-            // System.out.printf("Black Near King: %d -> -%d%n", blackNearKing, blackNearKing * 200);
+            System.out.printf("Escapes Blocked: %d -> -%d%n", escapesBlocked, escapesBlocked * 150);
             System.out.println("Total Evaluation Value: " + value);
         }
 
         return value;
-    }
-
-    private int blackPawnsNearKing(State state, int kingRow, int kingCol) {
-        int count = 0;
-        // Check for black pawns within a certain radius of the king
-        for (int i = kingRow - 2; i <= kingRow + 2; i++) {
-            for (int j = kingCol - 2; j <= kingCol + 2; j++) {
-                if (isValidPosition(state, i, j)) {
-                    State.Pawn pawn = state.getPawn(i, j);
-                    if (pawn.equalsPawn(State.Pawn.BLACK.toString())) {
-                        count++;
-                    }
-                }
-            }
-        }
-        return count;
-    }
-    
-    private boolean isValidPosition(State state, int row, int col) {
-        int size = state.getBoard().length;
-        return row >= 0 && row < size && col >= 0 && col < size;
     }
     
 
@@ -126,22 +78,6 @@ public class Heuristic {
         System.out.println("King not found!");
         
         return null; // Il re non è stato trovato (non dovrebbe accadere)
-    }
-
-    private int minKingDistanceToEscape(State state, int kingRow, int kingCol) {
-        int minDistance = Integer.MAX_VALUE;
-
-        // Le posizioni delle uscite sono le caselle sul bordo non occupate dalle citadelle
-        List<int[]> escapePositions = HeuristicUtils.getEscapePositions(state);
-
-        for (int[] escape : escapePositions) {
-            int distance = Math.abs(kingRow - escape[0]) + Math.abs(kingCol - escape[1]);
-            if (distance < minDistance) {
-                minDistance = distance;
-            }
-        }
-
-        return minDistance;
     }
 
     private int numberOfOpenEscapes(State state, int kingRow, int kingCol) {
@@ -190,56 +126,6 @@ public class Heuristic {
         return false;
     }
 
-    private int getKingMobility(State state, int kingRow, int kingCol) {
-        int mobility = 0;
-        int size = state.getBoard().length;
-
-        // Movimento verso l'alto
-        for (int i = kingRow - 1; i >= 0; i--) {
-            if (isCellFree(state, i, kingCol)) {
-                mobility++;
-            } else {
-                break;
-            }
-        }
-
-        // Movimento verso il basso
-        for (int i = kingRow + 1; i < size; i++) {
-            if (isCellFree(state, i, kingCol)) {
-                mobility++;
-            } else {
-                break;
-            }
-        }
-
-        // Movimento verso sinistra
-        for (int j = kingCol - 1; j >= 0; j--) {
-            if (isCellFree(state, kingRow, j)) {
-                mobility++;
-            } else {
-                break;
-            }
-        }
-
-        // Movimento verso destra
-        for (int j = kingCol + 1; j < size; j++) {
-            if (isCellFree(state, kingRow, j)) {
-                mobility++;
-            } else {
-                break;
-            }
-        }
-
-        return mobility;
-    }
-
-    private boolean isCellFree(State state, int row, int col) {
-        State.Pawn pawn = state.getPawn(row, col);
-        String box = state.getBox(row, col);
-
-        return pawn.equalsPawn(State.Pawn.EMPTY.toString()) && !HeuristicUtils.isCamp(box);
-    }
-
     private int numberOfThreatsToKing(State state, int kingRow, int kingCol) {
         int threats = 0;
         int size = state.getBoard().length;
@@ -251,45 +137,27 @@ public class Heuristic {
             int col = kingCol + dir[1];
             if (row >= 0 && row < size && col >= 0 && col < size) {
                 State.Pawn pawn = state.getPawn(row, col);
-                if (pawn.equalsPawn(State.Pawn.BLACK.toString())) {
+                if (pawn.equalsPawn(State.Pawn.BLACK.toString()) || HeuristicUtils.isCamp(state.getBox(row, col)) ) {
                     threats++;
                 }
             }
         }
-
-        return threats;
-    }
-
-    private int countWhiteInCenter(State state) {
-        int centerControl = 0;
-        int size = state.getBoard().length;
-        int center = size / 2;
-
-        // Consideriamo le caselle intorno al trono
-        int[][] positions = {
-            {center-1, center},
-            {center+1, center},
-            {center, center-1},
-            {center, center+1}
-        };
-
-        for (int[] pos : positions) {
-            State.Pawn pawn = state.getPawn(pos[0], pos[1]);
-            if (pawn.equalsPawn(State.Pawn.WHITE.toString())) {
-                centerControl++;
-            }
+        
+        if (kingRow == 4 && kingCol == 4) {
+            threats -= 2;
+        } else if ((kingRow == 4 && kingCol == 5) || (kingRow == 5 && kingCol == 4) || (kingRow == 3 && kingCol == 4) || (kingRow == 4 && kingCol == 3)) {
+            threats--;
         }
-
-        return centerControl;
+        if (threats < 0) {
+            return 0;
+        }
+        return threats;
     }
 
     private int numberOfEscapesBlocked(State state) {
         int escapesBlocked = 0;
 
-        // Ottieni le posizioni delle uscite
-        List<int[]> escapePositions = HeuristicUtils.getEscapePositions(state);
-
-        for (int[] escape : escapePositions) {
+        for (int[] escape : HeuristicUtils.escapes) {
             State.Pawn pawn = state.getPawn(escape[0], escape[1]);
             if (pawn.equalsPawn(State.Pawn.BLACK.toString())) {
                 escapesBlocked++;

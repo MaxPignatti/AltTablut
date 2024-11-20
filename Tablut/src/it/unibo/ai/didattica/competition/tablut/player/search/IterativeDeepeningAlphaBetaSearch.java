@@ -44,7 +44,7 @@ public class IterativeDeepeningAlphaBetaSearch {
         while (System.currentTimeMillis() - startTime < timeLimit) {
 
             try {
-
+                heuristic.evaluate(applyAction(state, actions.get(0)), true);
                 bestAction = alphaBetaSearch(state, actions, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
                 
                 System.out.println("Profondità: " + this.currentDepthLimit + " - Azione: " + bestAction + " - Valutazione: " + heuristic.evaluate(applyAction(state, bestAction), false));
