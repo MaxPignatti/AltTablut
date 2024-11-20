@@ -16,6 +16,19 @@ public class IterativeDeepeningAlphaBetaSearch {
 
     private Map<String, Action> bestMoves;
 
+    private Map<Long, TranspositionTableEntry> transpositionTable;
+
+    private static class TranspositionTableEntry {
+        public double value;
+        public int depth;
+
+        public TranspositionTableEntry(double value, int depth) {
+            this.value = value;
+            this.depth = depth;
+        }
+    }
+
+    private long[] zobristTable;
 
     public IterativeDeepeningAlphaBetaSearch(String player) {
         super();
@@ -27,9 +40,41 @@ public class IterativeDeepeningAlphaBetaSearch {
         }
 
         this.heuristic = new Heuristic();
-
         this.bestMoves = new HashMap<>();
+        this.transpositionTable = new HashMap<>();
     }
+
+    private void initializeZobristTable(int boardSize) {
+        Random rand = new Random(0);
+        int numPieces = 4;
+        zobristTable = new long[boardSize * boardSize * numPieces];
+        for (int i = 0; i < zobristTable.length; i++) {
+            zobristTable[i] = rand.nextLong();
+        }
+    }
+    
+
+    private long computeZobristHash(State state) {
+        long h = 0;
+        int size = state.getBoard().length;
+        int numPieces = 4;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                State.Pawn pawn = state.getPawn(i, j);
+                int piece = 0;
+                if (pawn.equalsPawn(State.Pawn.WHITE.toString())) {
+                    piece = 1;
+                } else if (pawn.equalsPawn(State.Pawn.BLACK.toString())) {
+                    piece = 2;
+                } else if (pawn.equalsPawn(State.Pawn.KING.toString())) {
+                    piece = 3;
+                }
+                h ^= zobristTable[(i * size + j) * numPieces + piece];
+            }
+        }
+        return h;
+    }
+    
 
     public Action makeDecision(State state, long startTime, long timeLimit) {
         this.startTime = startTime;
@@ -40,6 +85,8 @@ public class IterativeDeepeningAlphaBetaSearch {
         this.currentDepthLimit = 1;
 
         List<Action> actions = getLegalActions(state);
+
+        initializeZobristTable(state.getBoard().length);
 
         while (System.currentTimeMillis() - startTime < timeLimit) {
 
@@ -113,58 +160,82 @@ public class IterativeDeepeningAlphaBetaSearch {
 
     private double maxValue(State state, int depth, double alpha, double beta) throws TimeOutException {
         checkTime();
+    
+        long zobristHash = computeZobristHash(state);
+        
+        TranspositionTableEntry entry = transpositionTable.get(zobristHash);
 
-        if (isTerminal(state) || depth > this.currentDepthLimit) {
-            return playerCoefficient * heuristic.evaluate(state, false);
+        if (entry != null && entry.depth >= depth) {
+            System.out.println("Transposition Table hit: " + entry.value + "con Hash: " +  zobristHash);
+            return entry.value;
         }
-
+    
+        if (isTerminal(state) || depth >= this.currentDepthLimit) {
+            double eval = playerCoefficient * heuristic.evaluate(state, false);
+            storeInTranspositionTable(zobristHash, eval, depth);
+            return eval;
+        }
+    
         double value = Double.NEGATIVE_INFINITY;
-
         List<Action> actions = getLegalActions(state);
-
+    
         for (Action action : actions) {
             State nextState = applyAction(state, action);
             if (nextState == null) {
-                continue; // Salta azioni non valide
+                continue;
             }
-
+    
             value = Math.max(value, minValue(nextState, depth + 1, alpha, beta));
-
             alpha = Math.max(alpha, value);
             if (alpha >= beta) {
-                break; // Potatura beta
-            } 
+                break; // Beta cut-off
+            }
         }
-
+        
+        storeInTranspositionTable(zobristHash, value, depth);
+    
         return value;
     }
-
+    
     private double minValue(State state, int depth, double alpha, double beta) throws TimeOutException {
         checkTime();
-
-        if (isTerminal(state) || depth > this.currentDepthLimit) {
-            return playerCoefficient * heuristic.evaluate(state, false);
+    
+        long zobristHash = computeZobristHash(state);
+        
+        TranspositionTableEntry entry = transpositionTable.get(zobristHash);
+        
+        if (entry != null && entry.depth >= depth) {
+            System.out.println("Transposition Table hit: " + entry + "con Hash: " +  zobristHash);
+            return entry.value;
+        }   
+    
+        if (isTerminal(state) || depth >= this.currentDepthLimit) {
+            double eval = playerCoefficient * heuristic.evaluate(state, false);
+            storeInTranspositionTable(zobristHash, eval, depth);
+            return eval;
         }
-
+    
         double value = Double.POSITIVE_INFINITY;
-
         List<Action> actions = getLegalActions(state);
-
+    
         for (Action action : actions) {
             State nextState = applyAction(state, action);
             if (nextState == null) {
-                continue; // Salta azioni non valide
+                continue;
             }
+    
             value = Math.min(value, maxValue(nextState, depth + 1, alpha, beta));
-
             beta = Math.min(beta, value);
             if (alpha >= beta) {
-                break; // Potatura alpha
+                break;
             }
         }
-
+    
+        storeInTranspositionTable(zobristHash, value, depth);
+    
         return value;
     }
+    
 
     private void checkTime() throws TimeOutException {
         if (System.currentTimeMillis() - startTime >= timeLimit) {
@@ -202,5 +273,11 @@ public class IterativeDeepeningAlphaBetaSearch {
         return actions;
     }
     
+    private void storeInTranspositionTable(long zobristHash, double value, int depth) {
+        TranspositionTableEntry entry = transpositionTable.get(zobristHash);
+        if (entry == null || entry.depth < depth) {
+            transpositionTable.put(zobristHash, new TranspositionTableEntry(value, depth));
+        }
+    }    
 
 }
