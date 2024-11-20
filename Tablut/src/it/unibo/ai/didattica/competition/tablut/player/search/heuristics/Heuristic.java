@@ -3,6 +3,8 @@ package it.unibo.ai.didattica.competition.tablut.player.search.heuristics;
 import it.unibo.ai.didattica.competition.tablut.domain.State;
 import it.unibo.ai.didattica.competition.tablut.domain.State.Pawn;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Heuristic {
 
@@ -43,19 +45,19 @@ public class Heuristic {
         int openEscapes = numberOfOpenEscapes(state, kingRow, kingCol);
 
         // Valutazione complessiva
-        value += whitePawns * 120;          // Peso per le pedine bianche
-        value -= blackPawns * 70;           // Peso per le pedine nere
+        
+        value += whitePawns * 150;          // Peso per le pedine bianche
+        value -= blackPawns * 84.375;           // Peso per le pedine nere
         value += openEscapes * openEscapes * 700;         // Più vie di fuga aperte, meglio è per il bianco
         value -= threatsToKing * 700;       // Penalità per minacce al re
-        value -= escapesBlocked * 150;      // Più uscite bloccate, peggio è per il bianco
-
+        value -= escapesBlocked * 80;    
         if(printEval){
             System.out.println("Evaluation Details:");
-            System.out.printf("White Pawns: %d -> +%d%n", whitePawns, whitePawns * 120);
-            System.out.printf("Black Pawns: %d -> -%d%n", blackPawns, blackPawns * 70);
+            System.out.printf("White Pawns: %d -> +%d%n", whitePawns, whitePawns * 150);
+            System.out.printf("Black Pawns: %d -> -%d%n", blackPawns, blackPawns * 84);
             System.out.printf("Open Escapes: %d -> +%d%n", openEscapes, openEscapes * openEscapes * 700);
             System.out.printf("Threats to King: %d -> -%d%n", threatsToKing, threatsToKing * 700);
-            System.out.printf("Escapes Blocked: %d -> -%d%n", escapesBlocked, escapesBlocked * 150);
+            System.out.printf("Escapes Blocked: %d -> -%d%n", escapesBlocked, escapesBlocked * 80);
             System.out.println("Total Evaluation Value: " + value);
         }
 
@@ -154,16 +156,75 @@ public class Heuristic {
         return threats;
     }
 
-    private int numberOfEscapesBlocked(State state) {
-        int escapesBlocked = 0;
+    private static final int[][][] FIRST_GROUP = {
+        {{2, 0}, {2, 1}},
+        {{0, 2}, {1, 2}},
+        {{0, 6}, {1, 6}},
+        {{2, 7}, {2, 8}},
+        {{6, 0}, {6, 1}},
+        {{7, 2}, {8, 2}},
+        {{7, 6}, {8, 6}},
+        {{6, 7}, {6, 8}}
+    };
 
-        for (int[] escape : HeuristicUtils.escapes) {
+    // Secondo gruppo di condizioni (+1 se la prima cella è presente e la seconda no)
+    private static final int[][] SECOND_GROUP = {
+        {1, 0}, {1, 1},
+        {0, 1}, {1, 1},
+        {0, 7}, {1, 7},
+        {1, 8}, {1, 7},
+        {7, 0}, {7, 1},
+        {8, 1}, {7, 1},
+        {8, 7}, {7, 7},
+        {7, 8}, {7, 7}
+    };
+
+    // Terzo gruppo di condizioni (+2 se la cella è presente in blockingSet)
+    private static final int[][] THIRD_GROUP = {
+        {1, 1},
+        {1, 7},
+        {7, 1},
+        {7, 7}
+    };
+
+    private int numberOfEscapesBlocked(State state) {
+        int blockedEscapes = 0;
+
+        Set<Integer> blockingSet = new HashSet<>();
+
+        for (int[] escape : HeuristicUtils.blockingEscapesCells) {
             State.Pawn pawn = state.getPawn(escape[0], escape[1]);
             if (pawn.equalsPawn(State.Pawn.BLACK.toString())) {
-                escapesBlocked++;
+                blockingSet.add(escape[0] * 9 + escape[1]);
             }
         }
 
-        return escapesBlocked;
+        // Verifica del primo gruppo di condizioni
+        for (int[][] pair : FIRST_GROUP) {
+            int key1 = pair[0][0] * 9 + pair[0][1];
+            int key2 = pair[1][0] * 9 + pair[1][1];
+            if (blockingSet.contains(key1) || blockingSet.contains(key2)) {
+                blockedEscapes += 1;
+            }
+        }
+
+        // Verifica del secondo gruppo di condizioni
+        for (int i = 0; i < SECOND_GROUP.length; i += 2) {
+            int key1 = SECOND_GROUP[i][0] * 9 + SECOND_GROUP[i][1];
+            int key2 = SECOND_GROUP[i + 1][0] * 9 + SECOND_GROUP[i + 1][1];
+            if (blockingSet.contains(key1) && !blockingSet.contains(key2)) {
+                blockedEscapes += 1;
+            }
+        }
+
+        // Verifica del terzo gruppo di condizioni
+        for (int[] coord : THIRD_GROUP) {
+            int key = coord[0] * 9 + coord[1];
+            if (blockingSet.contains(key)) {
+                blockedEscapes += 2;
+            }
+        }
+
+        return blockedEscapes;
     }
 }

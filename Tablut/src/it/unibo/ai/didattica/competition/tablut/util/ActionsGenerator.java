@@ -6,30 +6,56 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 public class ActionsGenerator {
 
     // Definiamo le coordinate dei campi
     private static final Set<String> camps = new HashSet<>();
+    private static final Map<String, Integer> campToGroup = new HashMap<>();
 
     static {
-        // Coordinate dei campi
+        // Coordinate dei campi e associazione ai gruppi
+        // Gruppo 1
         camps.add("a4");
         camps.add("a5");
         camps.add("a6");
         camps.add("b5");
+        campToGroup.put("a4", 1);
+        campToGroup.put("a5", 1);
+        campToGroup.put("a6", 1);
+        campToGroup.put("b5", 1);
+
+        // Gruppo 2
         camps.add("i4");
         camps.add("i5");
         camps.add("i6");
         camps.add("h5");
+        campToGroup.put("i4", 2);
+        campToGroup.put("i5", 2);
+        campToGroup.put("i6", 2);
+        campToGroup.put("h5", 2);
+
+        // Gruppo 3
         camps.add("d1");
         camps.add("e1");
         camps.add("f1");
         camps.add("e2");
+        campToGroup.put("d1", 3);
+        campToGroup.put("e1", 3);
+        campToGroup.put("f1", 3);
+        campToGroup.put("e2", 3);
+
+        // Gruppo 4
         camps.add("d9");
         camps.add("e9");
         camps.add("f9");
         camps.add("e8");
+        campToGroup.put("d9", 4);
+        campToGroup.put("e9", 4);
+        campToGroup.put("f9", 4);
+        campToGroup.put("e8", 4);
     }
 
     public static List<Action> getLegalActions(State state) {
@@ -58,11 +84,10 @@ public class ActionsGenerator {
     private static List<Action> generateMovesForPawn(State state, int row, int col) throws IOException {
         List<Action> moves = new ArrayList<>();
         String from = state.getBox(row, col);
-        State.Pawn pawn = state.getPawn(row, col);
 
         // Movimento verso l'alto
         for (int i = row - 1; i >= 0; i--) {
-            if (isValidMove(state, row, col, i, col, pawn)) {
+            if (isValidMove(state, row, col, i, col)) {
                 String to = state.getBox(i, col);
                 moves.add(new Action(from, to, state.getTurn()));
             } else {
@@ -72,7 +97,7 @@ public class ActionsGenerator {
 
         // Movimento verso il basso
         for (int i = row + 1; i < state.getBoard().length; i++) {
-            if (isValidMove(state, row, col, i, col, pawn)) {
+            if (isValidMove(state, row, col, i, col)) {
                 String to = state.getBox(i, col);
                 moves.add(new Action(from, to, state.getTurn()));
             } else {
@@ -82,7 +107,7 @@ public class ActionsGenerator {
 
         // Movimento verso sinistra
         for (int j = col - 1; j >= 0; j--) {
-            if (isValidMove(state, row, col, row, j, pawn)) {
+            if (isValidMove(state, row, col, row, j)) {
                 String to = state.getBox(row, j);
                 moves.add(new Action(from, to, state.getTurn()));
             } else {
@@ -92,7 +117,7 @@ public class ActionsGenerator {
 
         // Movimento verso destra
         for (int j = col + 1; j < state.getBoard().length; j++) {
-            if (isValidMove(state, row, col, row, j, pawn)) {
+            if (isValidMove(state, row, col, row, j)) {
                 String to = state.getBox(row, j);
                 moves.add(new Action(from, to, state.getTurn()));
             } else {
@@ -103,48 +128,22 @@ public class ActionsGenerator {
         return moves;
     }
 
-    private static boolean isValidMove(State state, int rowFrom, int colFrom, int rowTo, int colTo, State.Pawn pawn) {
-        // Controllo che il percorso sia libero (contiene anche il controllo del trono in teoria)
-        if (!isPathClear(state, rowFrom, colFrom, rowTo, colTo)) {
-            return false;
-        }
-
-        State.Pawn toPawn = state.getPawn(rowTo, colTo);
-
-        // La destinazione deve essere vuota
-        if (!toPawn.equalsPawn(State.Pawn.EMPTY.toString())) {
-            return false;
-        }
-
-        String fromBox = state.getBox(rowFrom, colFrom);
-        String toBox = state.getBox(rowTo, colTo);
-
-        boolean isCitadel = camps.contains(toBox);
-
-        // I bianchi non possono entrare nei campi
-        if (state.getTurn().equalsTurn("W") && isCitadel) {
-            return false;
-        }
-
-        // I neri, una volta usciti dei campi, non possono rientrarci
-        if (state.getTurn().equalsTurn("B")) {
-            boolean fromCitadel = camps.contains(fromBox);
-            if (!fromCitadel && isCitadel) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static boolean isPathClear(State state, int rowFrom, int colFrom, int rowTo, int colTo) {
+    private static boolean isValidMove(State state, int rowFrom, int colFrom, int rowTo, int colTo) {
         int rowStep = Integer.compare(rowTo, rowFrom);
         int colStep = Integer.compare(colTo, colFrom);
 
-        int currentRow = rowFrom + rowStep;
-        int currentCol = colFrom + colStep;
+        String fromBox = state.getBox(rowFrom, colFrom);
+        String turn = state.getTurn().toString(); // "W" o "B"
+
+        // Determiniamo se la posizione di partenza è in un campo e otteniamo il gruppo di campi
+        Integer startingCampGroup = campToGroup.get(fromBox);
+
+        int currentRow = rowFrom;
+        int currentCol = colFrom;
 
         while (currentRow != rowTo || currentCol != colTo) {
+            currentRow += rowStep;
+            currentCol += colStep;
             State.Pawn currentPawn = state.getPawn(currentRow, currentCol);
             if (!currentPawn.equalsPawn(State.Pawn.EMPTY.toString())) {
                 return false;
@@ -152,23 +151,34 @@ public class ActionsGenerator {
 
             String currentBox = state.getBox(currentRow, currentCol);
 
-            // Controllo se la casella è un campo
-            if (camps.contains(currentBox)) {
-                // I bianchi non possono passare attraverso i campi
-                if (state.getTurn().equalsTurn("W")) {
+            // Controllo se la casella corrente è il trono
+            if (currentBox.equals("e5")) {
+                return false; // Nessuno può passare attraverso il trono
+            }
+
+            boolean isCurrentBoxCamp = camps.contains(currentBox);
+
+            if (isCurrentBoxCamp) {
+                // La casella corrente è un campo
+                if (turn.equals("W")) {
+                    // I bianchi non possono passare attraverso i campi
                     return false;
-                }
-                else { // I neri non possono rientrare nei campi una volta usciti
-                    String fromBox = state.getBox(rowFrom, colFrom);
-                    boolean fromCitadel = camps.contains(fromBox);
-                    if (!fromCitadel) {
+                } else if (turn.equals("B")) {
+                    // Pedina nera
+                    if (startingCampGroup != null) {
+                        // La pedina nera ha iniziato in un campo
+                        Integer currentCampGroup = campToGroup.get(currentBox);
+                        if (!startingCampGroup.equals(currentCampGroup)) {
+                            // Non può entrare in un gruppo di campi diverso
+                            return false;
+                        }
+                        // Altrimenti, stesso gruppo di campi: movimento consentito
+                    } else {
+                        // La pedina nera ha iniziato fuori dai campi: non può entrare in alcun campo
                         return false;
                     }
                 }
-            }
-
-            currentRow += rowStep;
-            currentCol += colStep;
+            } 
         }
         return true;
     }

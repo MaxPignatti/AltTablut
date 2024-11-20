@@ -89,7 +89,7 @@ public class TheGoatClient extends TablutClient {
     public static void main(String[] args) {
         String role = "white";
         String name = "AltTablut";
-        int timeout = 10;
+        int timeout = 60;
         String ipAddress = "localhost";
 
         if (args.length < 1) {
