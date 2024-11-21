@@ -36,10 +36,10 @@ public class Heuristic {
         int kingCol = kingPosition[1];
 
         // Minacce al re
-        int threatsToKing = numberOfThreatsToKing(state, kingRow, kingCol);
+        //int threatsToKing = numberOfThreatsToKing(state, kingRow, kingCol);
 
         // Controllo delle uscite
-        int escapesBlocked = numberOfEscapesBlocked(state);
+        //int escapesBlocked = numberOfEscapesBlocked(state);
 
         // Numero di vie di fuga aperte per il re
         int openEscapes = numberOfOpenEscapes(state, kingRow, kingCol);
@@ -49,15 +49,15 @@ public class Heuristic {
         value += whitePawns * 150;          // Peso per le pedine bianche
         value -= blackPawns * 84.375;           // Peso per le pedine nere
         value += openEscapes * openEscapes * 700;         // Più vie di fuga aperte, meglio è per il bianco
-        value -= threatsToKing * 700;       // Penalità per minacce al re
-        value -= escapesBlocked * 80;    
+        //value -= threatsToKing * 700;       // Penalità per minacce al re
+        //value -= escapesBlocked * 80;    
         if(printEval){
             System.out.println("Evaluation Details:");
             System.out.printf("White Pawns: %d -> +%d%n", whitePawns, whitePawns * 150);
             System.out.printf("Black Pawns: %d -> -%d%n", blackPawns, blackPawns * 84);
             System.out.printf("Open Escapes: %d -> +%d%n", openEscapes, openEscapes * openEscapes * 700);
-            System.out.printf("Threats to King: %d -> -%d%n", threatsToKing, threatsToKing * 700);
-            System.out.printf("Escapes Blocked: %d -> -%d%n", escapesBlocked, escapesBlocked * 80);
+            //System.out.printf("Threats to King: %d -> -%d%n", threatsToKing, threatsToKing * 700);
+            //System.out.printf("Escapes Blocked: %d -> -%d%n", escapesBlocked, escapesBlocked * 80);
             System.out.println("Total Evaluation Value: " + value);
         }
 
