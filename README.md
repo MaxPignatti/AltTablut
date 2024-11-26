@@ -2,6 +2,12 @@
 
 Software for the Tablut Students Competition
 
+## Group members
+- Alberto Benni
+- Filippo Terzi
+- Massimiliano Pignatti
+- Lorenzo Rolfini
+
 ## Installation on Ubuntu/Debian
 
 From console, run these commands to install JDK 8 e ANT:
