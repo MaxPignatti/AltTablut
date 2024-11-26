@@ -63,16 +63,24 @@ Example:
 java -jar .\server.jar -g -R .\logs\PLAYER1_vs_PLAYER2_1652711382324_gameLog.txt
 ```
 
-## Run and compile
+## Run and compile my player
 
-Compilare player:
-
-```
-ant goatclient
-```
-
-Eseguire player:
+Compile player:
 
 ```
-java -jar ./Executables/goatclient.jar white
+ant clean
+ant compile
+ant alttablut-jar
+```
+
+Run player:
+
+```
+java -jar ./Executables/AltTablut.jar <role> [<timeout>] [<ipAddress>]
+```
+
+Or run player with command:
+
+```
+sh runmyplayer.sh <role> [<timeout>] [<ipAddress>]
 ```
