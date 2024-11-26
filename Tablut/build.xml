@@ -111,8 +111,8 @@
         </java>
     </target>
 
-    <target name="goatclient">
-        <java classname="it.unibo.ai.didattica.competition.tablut.player.client.TheGoatClient" fork="true">
+    <target name="alttablut">
+        <java classname="it.unibo.ai.didattica.competition.tablut.player.client.AltTablutClient" fork="true">
             <classpath>
                 <pathelement location="lib/gson-2.2.2.jar"/>
                 <pathelement location="build"/>
@@ -120,10 +120,10 @@
         </java>
     </target>
 
-    <target name="goatclient-jar">
-        <jar destfile="Executables/goatclient.jar" filesetmanifest="mergewithoutmain">
+    <target name="alttablut-jar">
+        <jar destfile="Executables/AltTablut.jar" filesetmanifest="mergewithoutmain">
             <manifest>
-                <attribute name="Main-Class" value="it.unibo.ai.didattica.competition.tablut.player.client.TheGoatClient"/>
+                <attribute name="Main-Class" value="it.unibo.ai.didattica.competition.tablut.player.client.AltTablutClient"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
             <fileset dir="build"/>

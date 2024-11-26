@@ -44,11 +44,11 @@ public class IterativeDeepeningAlphaBetaSearch {
         while (System.currentTimeMillis() - startTime < timeLimit) {
 
             try {
-                heuristic.evaluate(applyAction(state, actions.get(0)), true);
+                // heuristic.evaluate(applyAction(state, actions.get(0)), true);
                 bestAction = alphaBetaSearch(state, actions, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
                 
-                System.out.println("Profondità: " + this.currentDepthLimit + " - Azione: " + bestAction + " - Valutazione: " + heuristic.evaluate(applyAction(state, bestAction), false));
-                heuristic.evaluate(applyAction(state, bestAction), true); // QUESTO È FATTO SOLO PER STAMPARE I VALORI DELL'EVAL
+                // System.out.println("Profondità: " + this.currentDepthLimit + " - Azione: " + bestAction + " - Valutazione: " + heuristic.evaluate(applyAction(state, bestAction), false));
+                // heuristic.evaluate(applyAction(state, bestAction), true); // QUESTO È FATTO SOLO PER STAMPARE I VALORI DELL'EVAL
 
                 bestMoves.put(state.toString(), bestAction);
 
@@ -68,7 +68,7 @@ public class IterativeDeepeningAlphaBetaSearch {
             
             if (!actions.isEmpty()) {
                 bestAction = actions.get(0);
-                System.out.println("Nessuna azione trovata, selezionata azione predefinita: " + bestAction);
+                // System.out.println("Nessuna azione trovata, selezionata azione predefinita: " + bestAction);
             } else {
                 // Nessuna azione legale disponibile
                 System.out.println("Nessuna azione legale disponibile");
