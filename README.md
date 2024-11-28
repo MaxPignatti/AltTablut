@@ -5,7 +5,7 @@ Software for the Tablut Students Competition
 ## Group members
 - Alberto Benni
 - Filippo Terzi
-- Massimiliano Pignatti
+- Massimo Pignatti
 - Lorenzo Rolfini
 
 ## Installation on Ubuntu/Debian
